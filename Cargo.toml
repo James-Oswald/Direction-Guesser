@@ -1,0 +1,7 @@
+[package]
+name = "Direction-Guesser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ntex = { version = "2.3.0", features = ["tokio"] }
