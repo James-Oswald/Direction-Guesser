@@ -158,13 +158,13 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "frontend",
+      "name": "DirectionGuesser",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-08-29T23:01:16.126282Z",
+  "generated": "2024-09-07T01:35:31.028769Z",
   "generator": "pub",
   "generatorVersion": "3.5.1",
   "flutterRoot": "file:///C:/Users/ishty/Work/Flutter/flutter",

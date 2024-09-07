@@ -1,3 +1,3 @@
 # frontend
 
-A new Flutter project.
+Flutter application that can be built to Android and iOS
