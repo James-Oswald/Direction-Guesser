@@ -1,0 +1,186 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is API for Direction Guesser using Swagger.  You can find out more about
+    Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,
+    #swagger](http://swagger.io/irc/).
+  version: 1.0.1
+  title: Direction Guesser
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+host: direction.guesser.io
+basePath: /v2
+tags:
+  - name: users
+    description: User related calls.
+schemes:
+  - https
+paths:
+  /users/:
+    get:
+      tags:
+        - users
+      summary: Returns a list of all usernames.
+      operationId: getUsers
+      responses:
+        '200':
+          description: List of usernames.
+          schema:
+            type: array
+            items:
+              type: string
+  /users/{username}:
+    post:
+      tags:
+        - users
+      summary: Creates a user.
+      operationId: createUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+        - name: password
+          in: header
+          type: string
+          required: true
+        - name: email
+          in: header
+          type: string
+          required: true
+        - name: age
+          in: header
+          type: integer
+          required: true
+        - name: gender
+          in: header
+          type: string
+          enum: [UNKNOWN, FEMALE, MALE]
+          required: true
+      responses:
+        '418': 
+          description: User already exists.
+        '200':
+          description: Id of the created user.
+          schema:
+            type: integer
+    get:
+      tags:
+        - users
+      summary: Get user by username.
+      operationId: getUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+      responses:
+        '403':
+          description: User does not exist.
+        '200':
+          description: User's public and private data.
+          schema:
+            type: string
+    put:
+      tags:
+        - users
+      summary: Update a user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+        - name: password
+          in: header
+          type: string
+          required: true
+      responses:
+        '403': 
+          description: Incorrect password for user.
+        '200':
+          description: User's public and private data.
+          schema:
+            type: string
+    delete:
+      tags:
+        - users
+      summary: Deletes a user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+        - name: password
+          in: header
+          type: string
+          required: true
+      responses:
+        '403': 
+          description: Incorrect password for user.
+        '200':
+          description: User's public and private data.
+          schema:
+            type: string
+  /user/login:
+    post:
+      tags:
+        - users
+      summary: Logs user into the system
+      operationId: loginUser
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: header
+          required: true
+          type: string
+        - name: password
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description:
+        '400':
+          description: Invalid username/password supplied
+  /user/logout:
+    post:
+      tags:
+        - users
+      summary: Logs out a user
+      operationId: logoutUser
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: header
+          required: true
+          type: string
+        - name: password
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description:
+
+definitions:
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+      password:
+        type: string
+      email:
+        type: string
+      age:
+        type: integer
+      gender:
+        type: string
+        enum: [FEMALE, MALE, UNKNOWN]
