@@ -1,2 +1,2 @@
-src/client/android/**    -linguist-vendored
-src/client/ios/**        -linguist-vendored
+src/client/android/**    linguist-vendored
+src/client/ios/**        linguist-vendored
