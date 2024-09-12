@@ -1,20 +1,4 @@
 #
-# SENSITIVE FILES
-#
-**/key.properties
-**/*.keystore
-**/*.jks
-
-#
-# EDITOR JUNK
-#
-
-# (ANDROID STUDIO)
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-#
 # BUILD JUNK
 #
 
@@ -29,12 +13,3 @@
 /build/
 app.*.symbols
 app.*.map.json
-
-# (JAVA)
-**/gradle-wrapper.jar
-**/.gradle
-**/captures/
-**/gradlew
-**/gradlew.bat
-**/local.properties
-**/GeneratedPluginRegistrant.java

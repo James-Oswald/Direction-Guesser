@@ -1,0 +1,29 @@
+#
+# BUILD JUNK
+#
+
+# (JAVA)
+**/.class
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+
+#
+# EDITOR JUNK
+#
+
+# (ANDROID STUDIO)
+/app/debug
+/app/profile
+/app/release
+
+#
+# SENSITIVE FILES
+#
+key.properties
+**/*.keystore
+**/*.jks
