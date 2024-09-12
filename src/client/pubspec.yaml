@@ -1,5 +1,5 @@
-name: DirectionGuesser
-description: "A new Flutter project."
+name: direction_guesser
+description: "Direction Guesser, the game that you direct!"
 publish_to: 'none'
 version: 0.1.0
 
