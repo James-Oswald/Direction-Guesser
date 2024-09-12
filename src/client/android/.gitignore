@@ -1,3 +1,9 @@
+#
+# BUILD JUNK
+#
+
+# (JAVA)
+**/.class
 gradle-wrapper.jar
 /.gradle
 /captures/
@@ -6,8 +12,18 @@ gradle-wrapper.jar
 /local.properties
 GeneratedPluginRegistrant.java
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/to/reference-keystore
+#
+# EDITOR JUNK
+#
+
+# (ANDROID STUDIO)
+/app/debug
+/app/profile
+/app/release
+
+#
+# SENSITIVE FILES
+#
 key.properties
 **/*.keystore
 **/*.jks

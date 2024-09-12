@@ -1,1 +1,34 @@
+#
+# BUILD JUNK
+#
 .build/
+
+#
+# EDITOR JUNK
+#
+
+# (ATOM)
+**/.atom/
+
+# (EMACS)
+**/\#*\#
+**/.\#*
+
+# (JETBRAINS)
+**/*.iml
+**/*.ipr
+**/*.iws
+**/.idea/
+
+# (VS)
+**/.vscode/
+
+#
+# OPERATING SYSTEM JUNK
+#
+
+# (UNIX)
+**/.history
+
+# (OSX)
+**/.DS_Store
