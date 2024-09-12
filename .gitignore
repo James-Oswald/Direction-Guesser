@@ -8,27 +8,27 @@
 #
 
 # (ATOM)
-.atom/
+**/.atom/
 
 # (EMACS)
-\#*\#
-.\#*
+**/\#*\#
+**/.\#*
 
 # (JETBRAINS)
-*.iml
-*.ipr
-*.iws
-.idea/
+**/*.iml
+**/*.ipr
+**/*.iws
+**/.idea/
 
 # (VS)
-.vscode/
+**/.vscode/
 
 #
 # OPERATING SYSTEM JUNK
 #
 
 # (UNIX)
-.history
+**/.history
 
 # (OSX)
-.DS_Store
+**/.DS_Store

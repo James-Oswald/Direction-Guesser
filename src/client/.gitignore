@@ -1,7 +1,7 @@
 #
 # SENSITIVE FILES
 #
-key.properties
+**/key.properties
 **/*.keystore
 **/*.jks
 
@@ -31,10 +31,10 @@ app.*.symbols
 app.*.map.json
 
 # (JAVA)
-gradle-wrapper.jar
-/.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
-GeneratedPluginRegistrant.java
+**/gradle-wrapper.jar
+**/.gradle
+**/captures/
+**/gradlew
+**/gradlew.bat
+**/local.properties
+**/GeneratedPluginRegistrant.java
