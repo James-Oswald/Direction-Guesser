@@ -5,6 +5,7 @@ SRC_VERSION = $(git rev-parse --short HEAD)
 TARGET_BUILD_DIR = .build/$@
 TARGET_SRC_DIR = src/$@
 
+
 #
 # COMPILER DEFINITION
 #
@@ -25,6 +26,7 @@ else
 	FLUTTERC_FLAGS += --debug
 endif
 
+
 #
 # TARGET DEFINITION
 #
