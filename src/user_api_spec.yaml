@@ -4,7 +4,7 @@ info:
     This is API for Direction Guesser using Swagger.  You can find out more about
     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,
     #swagger](http://swagger.io/irc/).
-  version: 1.0.1
+  version: 1.0.2
   title: Direction Guesser
   license:
     name: Apache 2.0
@@ -17,19 +17,6 @@ tags:
 schemes:
   - https
 paths:
-  /users/:
-    get:
-      tags:
-        - users
-      summary: Returns a list of all usernames.
-      operationId: getUsers
-      responses:
-        '200':
-          description: List of usernames.
-          schema:
-            type: array
-            items:
-              type: string
   /users/{username}:
     post:
       tags:
@@ -37,34 +24,19 @@ paths:
       summary: Creates a user.
       operationId: createUser
       parameters:
+        - name: user
+          in: body
+          schema:
+            $ref: '#/definitions/User'
         - name: username
           in: path
           type: string
-          required: true
-        - name: password
-          in: header
-          type: string
-          required: true
-        - name: email
-          in: header
-          type: string
-          required: true
-        - name: age
-          in: header
-          type: integer
-          required: true
-        - name: gender
-          in: header
-          type: string
-          enum: [UNKNOWN, FEMALE, MALE]
           required: true
       responses:
         '418': 
           description: User already exists.
         '200':
-          description: Id of the created user.
-          schema:
-            type: integer
+          description: User successfully created.
     get:
       tags:
         - users
@@ -75,13 +47,15 @@ paths:
           in: path
           type: string
           required: true
+        - name: sessionId
+          in: header
+          type: string
+          required: false
       responses:
         '403':
           description: User does not exist.
         '200':
-          description: User's public and private data.
-          schema:
-            type: string
+          description: If sessionId matches the user -> public and private data. If sessionId does not match or there is no sessionId -> public data.
     put:
       tags:
         - users
@@ -92,39 +66,23 @@ paths:
           in: path
           type: string
           required: true
-        - name: password
+        - name: sessionId
           in: header
           type: string
           required: true
+        - name: updateValue
+          in: body
+          schema:
+            type: string
+          required: true
       responses:
         '403': 
-          description: Incorrect password for user.
+          description: Incorrect sessionId for user.
         '200':
           description: User's public and private data.
           schema:
             type: string
-    delete:
-      tags:
-        - users
-      summary: Deletes a user.
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          type: string
-          required: true
-        - name: password
-          in: header
-          type: string
-          required: true
-      responses:
-        '403': 
-          description: Incorrect password for user.
-        '200':
-          description: User's public and private data.
-          schema:
-            type: string
-  /user/login:
+  /users/{username}/login:
     post:
       tags:
         - users
@@ -134,19 +92,22 @@ paths:
         - application/json
       parameters:
         - name: username
-          in: header
+          in: path
           required: true
           type: string
         - name: password
-          in: header
+          in: body
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         '200':
-          description:
+          description: sessionId
+          schema: 
+            type: string
         '400':
-          description: Invalid username/password supplied
-  /user/logout:
+          description: Invalid username/password combination supplied.
+  /users/{username}/logout:
     post:
       tags:
         - users
@@ -156,23 +117,24 @@ paths:
         - application/json
       parameters:
         - name: username
-          in: header
+          in: path
           required: true
           type: string
-        - name: password
-          in: header
+        - name: sessionId
+          in: body
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         '200':
-          description:
+          description: User successfully logged out.
+        '400':
+          description: Invalid sessionId.
 
 definitions:
   User:
     type: object
     properties:
-      id:
-        type: integer
       username:
         type: string
       password:
@@ -183,4 +145,4 @@ definitions:
         type: integer
       gender:
         type: string
-        enum: [FEMALE, MALE, UNKNOWN]
+        enum: [FEMALE, MALE, OTHER]
