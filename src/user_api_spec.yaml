@@ -1,0 +1,148 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is API for Direction Guesser using Swagger.  You can find out more about
+    Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,
+    #swagger](http://swagger.io/irc/).
+  version: 1.0.2
+  title: Direction Guesser
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+host: direction.guesser.io
+basePath: /v2
+tags:
+  - name: users
+    description: User related calls.
+schemes:
+  - https
+paths:
+  /users/{username}:
+    post:
+      tags:
+        - users
+      summary: Creates a user.
+      operationId: createUser
+      parameters:
+        - name: user
+          in: body
+          schema:
+            $ref: '#/definitions/User'
+        - name: username
+          in: path
+          type: string
+          required: true
+      responses:
+        '418': 
+          description: User already exists.
+        '200':
+          description: User successfully created.
+    get:
+      tags:
+        - users
+      summary: Get user by username.
+      operationId: getUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+        - name: sessionId
+          in: header
+          type: string
+          required: false
+      responses:
+        '403':
+          description: User does not exist.
+        '200':
+          description: If sessionId matches the user -> public and private data. If sessionId does not match or there is no sessionId -> public data.
+    put:
+      tags:
+        - users
+      summary: Update a user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+        - name: sessionId
+          in: header
+          type: string
+          required: true
+        - name: updateValue
+          in: body
+          schema:
+            type: string
+          required: true
+      responses:
+        '403': 
+          description: Incorrect sessionId for user.
+        '200':
+          description: User's public and private data.
+          schema:
+            type: string
+  /users/{username}/login:
+    post:
+      tags:
+        - users
+      summary: Logs user into the system
+      operationId: loginUser
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+        - name: password
+          in: body
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: sessionId
+          schema: 
+            type: string
+        '400':
+          description: Invalid username/password combination supplied.
+  /users/{username}/logout:
+    post:
+      tags:
+        - users
+      summary: Logs out a user
+      operationId: logoutUser
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+        - name: sessionId
+          in: body
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User successfully logged out.
+        '400':
+          description: Invalid sessionId.
+
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      email:
+        type: string
+      age:
+        type: integer
+      gender:
+        type: string
+        enum: [FEMALE, MALE, OTHER]
