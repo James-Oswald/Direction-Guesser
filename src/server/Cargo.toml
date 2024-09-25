@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bastion = "0.4.5"
 ntex = { version = "2.3.0", features = ["tokio"] }
+serde = "1.0.210"
