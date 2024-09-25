@@ -1,0 +1,66 @@
+name: master
+
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+  workflow_dispatch:
+
+jobs:
+  build_and_test_server:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-24.04
+          - target: x86_64-apple-darwin
+            os: macos-14
+          - target: x86_64-pc-windows-msvc
+            os: windows-2022
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: build
+        run:  make RELEASE=1 server
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ matrix.target }}-${{ github.sha }}
+          path: .build/server/bin/*
+          if-no-files-found: error
+
+  build_and_test_client:
+    strategy:
+      matrix:
+        include:
+          - target: bundle-android-apk
+            os: ubuntu-24.04
+          - target: bundle-ios-app
+            os: macos-14
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: install toolchain (flutter sdk)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.24.3
+
+      - name: test toolchain
+        run: flutter doctor -v
+
+      - name: build
+        run: make ${{ matrix.target }}
+
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-${{ matrix.target }}-${{ github.sha }}
+          path: ${{ matrix.target == 'bundle-android-apk' && '.build/client/app/outputs/flutter-apk/*.apk' ||
+                    matrix.target == 'bundle-ios-app' && '.build/client/ios/iphoneos/*.app' }}
+          if-no-files-found: error
