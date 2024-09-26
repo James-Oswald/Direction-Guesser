@@ -1,13 +1,51 @@
 name: master
 
 on:
-  push:
-    tags:
-      - v[0-9]+.*
+  pull_request:
+    types: [review_requested]
+
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'What to build:'
+        required: true
+        type: choice
+        options:
+          - server
+          - client
+          - everything
+        default: 'everything'
+      release:
+        description: 'Build a release?'
+        required: true
+        type: boolean
+        default: true
+
 
 jobs:
+  changed_files:
+    outputs:
+      server: ${{ steps.changed-files.outputs.server_any_modified == 'true' ||
+                  inputs.target == 'server' || inputs.target == 'everything' }}
+      client: ${{ steps.changed-files.outputs.client_any_modified == 'true' ||
+                  inputs.target == 'client' || inputs.target == 'everything' }}
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: compute file changes
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            server: src/server/**
+            client: src/client/**
+
   build_and_test_server:
+    needs: [ changed_files ]
+    if: ${{ needs.changed_files.outputs.server == 'true' }}
     strategy:
       matrix:
         include:
@@ -23,7 +61,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
       - name: build
-        run:  make RELEASE=1 server
+        run:  make RELEASE=${{ inputs.release == false && '0' || '1'}} server
       - name: upload
         uses: actions/upload-artifact@v4
         with:
@@ -32,6 +70,8 @@ jobs:
           if-no-files-found: error
 
   build_and_test_client:
+    needs: [ changed_files ]
+    if: ${{ needs.changed_files.outputs.client == 'true' }}
     strategy:
       matrix:
         include:
