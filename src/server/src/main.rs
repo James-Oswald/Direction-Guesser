@@ -46,7 +46,7 @@ fn spawn_user_session(username: String) -> ChildRef
     .expect("Failed to spawn user session")
 }
 
-async fn create_user_handler(
+async fn pos_user_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
     user_map: web::types::Data<UserMap>,) -> impl Responder
@@ -98,7 +98,7 @@ async fn get_user_handler(
     }
 }
 
-async fn update_user_handler(
+async fn put_user_handler(
     req: HttpRequest,
     path: web::types::Path<(String,)>,
     update_value: web::types::Json<String>,
@@ -121,7 +121,7 @@ async fn update_user_handler(
     HttpResponse::build(403).body("Incorrect sessionId for user.")
 }
 
-async fn login_user_handler(
+async fn post_user_login_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
     user_map: web::types::Data<UserMap>,
@@ -146,7 +146,7 @@ async fn login_user_handler(
     HttpResponse::BadRequest().body("Invalid username/password combination.")
 }
 
-async fn logout_user_handler(
+async fn post_user_logout_handler(
     body: web::types::Json<String>,
     path: web::types::Path<(String,)>,
     session_map: web::types::Data<SessionMap>,) -> impl Responder
@@ -193,17 +193,17 @@ async fn main() -> std::io::Result<()>
             .app_data(session_map.clone())
             .service(
                 web::resource("/users/{username}")
-                    .route(web::post().to(create_user_handler)) // Create user
+                    .route(web::post().to(pos_user_handler)) // Create user
                     .route(web::get().to(get_user_handler)) // Get user
-                    .route(web::put().to(update_user_handler)) // Update user
+                    .route(web::put().to(put_user_handler)) // Update user
             )
             .service(
                 web::resource("/users/{username}/login")
-                    .route(web::post().to(login_user_handler)) // Login user
+                    .route(web::post().to(post_user_login_handler)) // Login user
             )
             .service(
                 web::resource("/users/{username}/logout")
-                    .route(web::post().to(logout_user_handler)) // Logout user
+                    .route(web::post().to()) // Logout user
             )
     })
     .bind("127.0.0.1:8080")?
