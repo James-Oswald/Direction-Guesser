@@ -1,0 +1,102 @@
+name: master
+
+on:
+  pull_request:
+    types: [review_requested]
+
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'What to build:'
+        required: true
+        type: choice
+        options:
+          - server
+          - client
+          - everything
+        default: 'everything'
+      release:
+        description: 'Build a release?'
+        required: true
+        type: boolean
+        default: true
+
+
+jobs:
+  changed_files:
+    outputs:
+      server: ${{ steps.changed-files.outputs.server_any_modified == 'true' ||
+                  inputs.target == 'server' || inputs.target == 'everything' }}
+      client: ${{ steps.changed-files.outputs.client_any_modified == 'true' ||
+                  inputs.target == 'client' || inputs.target == 'everything' }}
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout repository
+        uses: tj-actions/changed-files@45
+        with:
+          files_yaml: |
+            server: src/server/**
+            client: src/client/**
+
+  build_and_test_server:
+    needs: [ changed_files ]
+    if: {{ needs.changed-files.outputs.server == 'true' }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-24.04
+          - target: x86_64-apple-darwin
+            os: macos-14
+          - target: x86_64-pc-windows-msvc
+            os: windows-2022
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: build
+        run:  make RELEASE=${{ inputs.release == false && '0' || '1'}} server
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ matrix.target }}-${{ github.sha }}
+          path: .build/server/bin/*
+          if-no-files-found: error
+
+  build_and_test_client:
+    needs: [ changed_files ]
+    if: {{ needs.changed-files.outputs.client == 'true' }}
+    strategy:
+      matrix:
+        include:
+          - target: bundle-android-apk
+            os: ubuntu-24.04
+          - target: bundle-ios-app
+            os: macos-14
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: install toolchain (flutter sdk)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.24.3
+
+      - name: test toolchain
+        run: flutter doctor -v
+
+      - name: build
+        run: make ${{ matrix.target }}
+
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-${{ matrix.target }}-${{ github.sha }}
+          path: ${{ matrix.target == 'bundle-android-apk' && '.build/client/app/outputs/flutter-apk/*.apk' ||
+                    matrix.target == 'bundle-ios-app' && '.build/client/ios/iphoneos/*.app' }}
+          if-no-files-found: error
