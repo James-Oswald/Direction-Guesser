@@ -5,3 +5,8 @@ edition = "2021"
 
 [dependencies]
 ntex = { version = "2.3.0", features = ["tokio"] }
+native_db = "0.7.1"
+native_model = "0.4.19"
+argon2 = "0.5.3"
+once_cell = "1.19.0"
+serde = "1.0.210"

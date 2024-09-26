@@ -1,23 +1,42 @@
-use ntex::web;
+use native_db::*;
+use once_cell::sync::Lazy;
 
-#[web::get("/")]
-async fn index() -> impl web::Responder {
-    "Hello, World!"
-}
+mod types;
+use types::*;
 
-#[web::get("/{name}")]
-async fn hello(name: web::types::Path<String>) -> impl web::Responder {
-    web::HttpResponse::Ok()
-        .content_type("text/plain")
-        //THIS IS FOR THE DEMO, DO NOT DO THIS IN PRODUCTION GET RID OF THIS SOON
-        .set_header(ntex::http::header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
-        .body(format!("Hello {}!", &name))
-}
+// Define the models
+// The lifetime of the models needs to be longer or equal to the lifetime of the database.
+// In many cases, it is simpler to use a static variable but it is not mandatory.
+static MODELS: Lazy<Models> = Lazy::new(|| {
+    let mut models = Models::new();
+    models.define::<Item>().unwrap();
+    models
+});
 
-#[ntex::main]
-async fn main() -> std::io::Result<()> {
-    web::HttpServer::new(|| web::App::new().service(index).service(hello))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+fn main() -> Result<(), db_type::Error> {
+    // Create a database in memory
+    let mut db = Builder::new().create_in_memory(&MODELS)?;
+
+    // Insert data (open a read-write transaction)
+    let rw = db.rw_transaction()?;
+    rw.insert(Item { id: 1, name: "red".to_string() })?;
+    rw.insert(Item { id: 2, name: "green".to_string() })?;
+    rw.insert(Item { id: 3, name: "blue".to_string() })?;
+    rw.commit()?;
+
+    // Open a read-only transaction
+    let r = db.r_transaction()?;
+    // Retrieve data with id=3
+    let retrieve_data: Item = r.get().primary(3_u32)?.unwrap();
+    println!("data id='3': {:?}", retrieve_data);
+    // Iterate items with name starting with "red"
+    for item in r.scan().secondary::<Item>(ItemKey::name)?.start_with("red") {
+        println!("data name=\"red\": {:?}", item);
+    }
+
+    // Remove data (open a read-write transaction)
+    let rw = db.rw_transaction()?;
+    rw.remove(retrieve_data)?;
+    rw.commit()?;
+    Ok(())
 }
