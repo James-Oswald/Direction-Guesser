@@ -57,10 +57,10 @@ async fn pos_user_handler(
 
     if map.contains_key(&username) {
         return HttpResponse::build(418).body("User already exists.");
+    } else {
+        map.insert(username.clone(), new_user);
+        return HttpResponse::Ok().body("User successfully created.")
     }
-
-    map.insert(username.clone(), new_user);
-    HttpResponse::Ok().body("User successfully created.")
 }
 
 async fn get_user_handler(
@@ -71,30 +71,25 @@ async fn get_user_handler(
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok());
-    let user_map = user_map.lock().unwrap();
 
-    if let Some(user) = user_map.get(&username)
-    {
-        if let Some(session_id) = session_id
-        {
-            let session_map = session_map.lock().unwrap();
-            if let Some(sess_user) = session_map.get(session_id)
-            {
-                // if current session matches. then return full data
-                println!("Session ID matched for user {}", username);
-                return HttpResponse::Ok().json(user);
-            }
+    let user_map = user_map.lock().unwrap();
+    let session_map = session_map.lock().unwrap();
+
+    if let Some(user, session_id) = (user_map.get(&username), session_id) {
+        if let Some(sess_user) = session_map.get(session_id) {
+            // if current session matches. then return full data
+            println!("Session ID matched for user {}", username);
+            return HttpResponse::Ok().json(user);
+        } else {
+            // else return public data
+            let public_data = User {
+                username: user.username.clone(),
+                password: String::from("***"),
+            };
+            return HttpResponse::Ok().json(public_data)
         }
-        // else return public data
-        let public_data = User
-        {
-            username: user.username.clone(),
-            password: String::from("***"),
-        };
-        HttpResponse::Ok().json(public_data)
-    } else
-    {
-        HttpResponse::build(403).body("User does not exist.")
+    } else {
+        return HttpResponse::build(403).body("User does not exist.")
     }
 }
 
@@ -107,18 +102,16 @@ async fn put_user_handler(
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok());
-    let session_map = session_map.lock().unwrap();
 
-    if let Some(sess_user) = session_id.and_then(|sid| session_map.get(sid))
-    {
-        let mut user_map = user_map.lock().unwrap();
-        if let Some(user) = user_map.get_mut(&username)
-        {
-            user.password = update_value.into_inner(); //whatever we want update to do, just pw rn
-            return HttpResponse::Ok().json(user);
-        }
+    let session_map = session_map.lock().unwrap();
+    let mut user_map = user_map.lock().unwrap();
+
+    if let (Some(user), Some(sess_user)) = (user_map.get_mut(&username), session_id.and_then(|sid| session_map.get(sid))) {
+        user.password = update_value.into_inner(); //whatever we want update to do, just pw rn
+        return HttpResponse::Ok().json(user);
+    } else {
+        return HttpResponse::build(403).body("Incorrect sessionId for user.")
     }
-    HttpResponse::build(403).body("Incorrect sessionId for user.")
 }
 
 async fn post_user_login_handler(
@@ -141,9 +134,12 @@ async fn post_user_login_handler(
             let mut session_map = session_map.lock().unwrap();
             session_map.insert(session_id.clone(), session_process);
             return HttpResponse::Ok().json(session_id); //returns id token
+        } else {
+            return HttpResponse::BadRequest().body("Invalid password.")
         }
+    } else {
+        return HttpResponse::BadRequest().body("Invalid username.")
     }
-    HttpResponse::BadRequest().body("Invalid username/password combination.")
 }
 
 async fn post_user_logout_handler(
@@ -155,12 +151,10 @@ async fn post_user_logout_handler(
     let (username,) = path.into_inner();
     let mut session_map = session_map.lock().unwrap();
 
-    if session_map.remove(&session_id).is_some()
-    {
-        HttpResponse::Ok().body("User successfully logged out.")
-    } else
-    {
-        HttpResponse::BadRequest().body("Invalid sessionId.")
+    if session_map.remove(&session_id).is_some() {
+        return HttpResponse::Ok().body("User successfully logged out.")
+    } else {
+        return HttpResponse::BadRequest().body("Invalid sessionId.")
     }
 }
 
