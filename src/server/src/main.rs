@@ -193,17 +193,17 @@ async fn main() -> std::io::Result<()>
             .app_data(session_map.clone())
             .service(
                 web::resource("/users/{username}")
-                    .route(web::post().to(pos_user_handler)) // Create user
-                    .route(web::get().to(get_user_handler)) // Get user
-                    .route(web::put().to(put_user_handler)) // Update user
+                    .route(web::post().to(pos_user_handler))
+                    .route(web::get().to(get_user_handler))
+                    .route(web::put().to(put_user_handler))
             )
             .service(
                 web::resource("/users/{username}/login")
-                    .route(web::post().to(post_user_login_handler)) // Login user
+                    .route(web::post().to(post_user_login_handler))
             )
             .service(
                 web::resource("/users/{username}/logout")
-                    .route(web::post().to()) // Logout user
+                    .route(web::post().to())
             )
     })
     .bind("127.0.0.1:8080")?
