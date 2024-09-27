@@ -41,8 +41,10 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files_yaml: |
-            server: src/server/**
-            client: src/client/**
+            server:
+              - src/server/**
+            client:
+              - src/client/**
 
   build_and_test_server:
     needs: [ changed_files ]
