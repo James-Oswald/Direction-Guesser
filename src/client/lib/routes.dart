@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/home.dart';
 import 'pages/login.dart';
-import 'pages/register.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {

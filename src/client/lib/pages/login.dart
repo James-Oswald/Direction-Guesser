@@ -1,3 +1,5 @@
+import 'package:direction_guesser/theme.dart';
+import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -7,171 +9,130 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.lightScheme()),
+      darkTheme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.darkScheme()),
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromARGB(255, 224, 193, 107),
-                Color.fromARGB(255, 161, 117, 226)
-              ]),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          extendBody: true,
-          body: Center(
-            child: Container(
-            alignment: Alignment.center,
-            decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-                  Color.fromARGB(255, 161, 117, 226),
-                  Color.fromARGB(255, 206, 165, 78)
-                ]),
-                shadows: [
-                  BoxShadow(
-                      color: const Color.fromARGB(255, 88, 88, 88),
-                      offset: Offset(0, 2),
-                      blurRadius: 4)
-                ]),
-            height: double.infinity,
-            margin: EdgeInsets.all(40),
-            padding: EdgeInsets.all(10),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Center(
-                    child: Image.asset(
+      home: Builder(
+        builder: (context) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context).brightness == Brightness.light ? Color(0xFFFAF8FF) : Color(0xFF121318),
+                    Theme.of(context).brightness == Brightness.light ? Color(0xFF495D92) : Color(0xFF151B2C)
+                  ]
+              ),
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Spacer(),
+                    Image.asset(
                       "assets/logo.png",
                       width: 300,
                       height: 300,
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      "Direction Guesser",
-                      style: TextStyle(
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Center(
-                      child: Text("Directables!",
-                          style: TextStyle(color: Colors.white))),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 226, 241, 252).withOpacity(.9),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 88, 88, 88),
-                          blurRadius: 10,
-                        )
-                      ],
-                    ),
-                    child: Container(
-                      height: 20,
-                      child: TextField(
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Email",
-                            hintStyle: TextStyle(
-                                color: const Color.fromARGB(255, 0, 0, 0)),
-                            icon: Icon(
-                              Icons.email,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              size: 20,
-                            )),
+                    Spacer(),
+                    SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 64,
+                    child: TextEntryPill(
+                      icon: Icon(
+                        Icons.email_rounded,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
+                      hintText: "email",
+                      obscured: false,
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 226, 241, 252).withOpacity(.9),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 88, 88, 88),
-                          blurRadius: 10,
-                        )
-                      ],
-                    ),
-                    child: Container(
-                      height: 20,
-                      child: TextField(
-                        obscureText: true,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Password",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            icon: Icon(
-                              Icons.lock,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              size: 20,
-                            )),
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text("Login", style: TextStyle(color: Colors.white)),
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(
-                                    Color.fromARGB(255, 161, 117, 226))),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(color: Colors.white),
+                  SizedBox(height: 8),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 64,
+                    child: TextEntryPill(
+                        icon: Icon(
+                          Icons.key_rounded,
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
                         ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          child: Text("Sign Up", style: TextStyle(color: Colors.white)),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color.fromARGB(255, 161, 117, 226))),
-                        )
-                      ],
+                        hintText: "password",
+                        obscured: true
                     ),
-                  )
-                ],
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 64),
+                        Text(
+                          "Forgot password?",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontStyle: Theme.of(context).textTheme.labelSmall?.fontStyle,
+                              fontSize: Theme.of(context).textTheme.labelSmall?.fontSize,
+                              color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
+                          ),
+                        )
+                      ]
+                    ),
+                  ),
+                  FilledButton(
+                      onPressed: () => {}, // TODO: REST API login call
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                          fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
+                        ),
+                        selectionColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                      )
+                  ),
+                  SizedBox(height: 64),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "New?",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontStyle: Theme.of(context).textTheme.headlineSmall?.fontStyle,
+                          fontSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
+                          color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
+                        ),
+                      ),
+                      SizedBox(width: 24),
+                      FilledButton(
+                          onPressed: () => {}, // TODO: REST API signup call
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                                fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
+                            ),
+                            selectionColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                          )
+                      ),
+                    ],
+                  ),
+                  Spacer()],
+                ),
               ),
             ),
-          )),
-        ),
-      ),
+          );}
+      )
     );
   }
 }
