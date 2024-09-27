@@ -26,9 +26,9 @@ permissions:
 jobs:
   changed_files:
     outputs:
-      server: ${{ steps.changed-files.outputs.server_any_modified == 'true' ||
+      server: ${{ steps.files.outputs.server_any_modified == 'true' ||
                   inputs.target == 'server' || inputs.target == 'everything' }}
-      client: ${{ steps.changed-files.outputs.client_any_modified == 'true' ||
+      client: ${{ steps.files.outputs.client_any_modified == 'true' ||
                   inputs.target == 'client' || inputs.target == 'everything' }}
     runs-on: ubuntu-24.04
 
@@ -38,6 +38,7 @@ jobs:
         with:
           fetch-depth: 2
       - name: compute file changes
+        id: files
         uses: tj-actions/changed-files@v45
         with:
           files_yaml: |
