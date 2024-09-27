@@ -2,7 +2,6 @@ name: master
 
 on:
   pull_request:
-    types: [review_requested]
 
   workflow_dispatch:
     inputs:
@@ -33,7 +32,11 @@ jobs:
 
     steps:
       - name: checkout repository
-        uses: tj-actions/changed-files@45
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: compute file changes
+        uses: tj-actions/changed-files@v45
         with:
           files_yaml: |
             server: src/server/**
@@ -41,8 +44,9 @@ jobs:
 
   build_and_test_server:
     needs: [ changed_files ]
-    if: {{ needs.changed-files.outputs.server == 'true' }}
+    if: ${{ needs.changed_files.outputs.server == 'true' }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - target: x86_64-unknown-linux-gnu
@@ -67,8 +71,9 @@ jobs:
 
   build_and_test_client:
     needs: [ changed_files ]
-    if: {{ needs.changed-files.outputs.client == 'true' }}
+    if: ${{ needs.changed_files.outputs.client == 'true' }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - target: bundle-android-apk
@@ -97,6 +102,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: client-${{ matrix.target }}-${{ github.sha }}
-          path: ${{ matrix.target == 'bundle-android-apk' && '.build/client/app/outputs/flutter-apk/*.apk' ||
+          path: ${{ matrix.target == 'bundle-android-apk' && '.build/client/build/app/outputs/flutter-apk/*.apk' ||
                     matrix.target == 'bundle-ios-app' && '.build/client/ios/iphoneos/*.app' }}
           if-no-files-found: error

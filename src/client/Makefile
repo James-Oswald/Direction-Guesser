@@ -16,6 +16,9 @@ configure:
 .PHONY: bundle-android-apk
 bundle-android-apk: configure
 	$(FLUTTERC_APK) $(FLUTTERC_FLAGS)
+# FLUTTER IS BUGGY; APK BUILDS DO NOT RESPECT OUR SETTINGS
+	mkdir -p $(BUILD_DIR)
+	mv build $(BUILD_DIR)
 
 .PHONY: bundle-android-apk
 bundle-ios-app: configure
