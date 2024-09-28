@@ -100,7 +100,7 @@ async fn get_user_handler(
     let session_map = session_map.lock().unwrap();
 
 
-    if let Some(user, sess_user) = (user_map.get(&username), session_map.get(session_id)) {
+    if let (Some(user), Some(sess_user)) = (user_map.get(&username), session_map.get(session_id)) {
         if sess_user == &username {
             // if current session matches. then return full data
             println!("Session ID matched for user {}", username);
@@ -139,7 +139,7 @@ async fn put_user_handler(
             user.password = update_value.into_inner(); //whatever we want update to do, just pw rn
             return HttpResponse::Ok().json(user);
         } else {
-            return HttpResponse:::Unauthorized().body("Incorrect sessionId for user.");
+            return HttpResponse::Unauthorized().body("Incorrect sessionId for user.");
         }
     } else {
         return HttpResponse::BadRequest().body("User does not exist");
@@ -163,8 +163,8 @@ async fn post_user_login_handler(
             let session_id = format!("session-{}", username); //will revamp session ID generation to be better when
 
             let mut session_map = session_map.lock().unwrap();
-            session_map.insert(session_id.clone(), session_process);
-            return HttpResponse::Ok().json(session_id); //returns id token
+            session_map.insert(session_id.clone(), username.clone());
+            return HttpResponse::Ok().json(&session_id); //returns id token
         } else {
             return HttpResponse::BadRequest().body("Invalid password.")
         }
@@ -233,7 +233,7 @@ async fn main() -> std::io::Result<()>
             )
             .service(
                 web::resource("/users/{username}/logout")
-                    .route(web::post().to())
+                    .route(web::post().to(post_user_logout_handler))
             )
     })
     .bind("127.0.0.1:8080")?
