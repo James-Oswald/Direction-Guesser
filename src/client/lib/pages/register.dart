@@ -165,7 +165,7 @@ class RegisterPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       FilledButton(
-                        onPressed: (){Navigator.pushReplacementNamed(context, '/login');}, // TODO: REST API signup call
+                        onPressed: (){Navigator.pop(context);}, // TODO: REST API signup call
                           style: FilledButton.styleFrom(
                             backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -181,7 +181,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       SizedBox(width: 24),
                       FilledButton(
-                        onPressed: (){Navigator.pushReplacementNamed(context, '/register');}, // TODO: REST API signup call
+                        onPressed: (){}, // TODO: REST API signup call
                         style: FilledButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
