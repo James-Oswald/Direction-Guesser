@@ -1,3 +1,4 @@
+import 'package:direction_guesser/theme.dart';
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
@@ -10,6 +11,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        theme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.lightScheme()),
+        darkTheme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.darkScheme()),
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute, 
       initialRoute: CheckSessionStatus() ? '/home' : '/login'
     );
