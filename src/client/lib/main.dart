@@ -1,9 +1,17 @@
 import 'package:direction_guesser/theme.dart';
+import 'package:direction_guesser/controllers/usersServices.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'routes.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(
+    MultiProvider(providers: [
+      Provider(create: (_) => usersServices())
+    ], child: MainApp()
+    )
+  );
 }
 
 class MainApp extends StatelessWidget {
