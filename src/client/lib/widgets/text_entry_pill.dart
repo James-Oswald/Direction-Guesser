@@ -27,7 +27,6 @@ class TextEntryPill extends StatelessWidget {
           fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
           color: Theme.of(context).colorScheme.outline
         ),
-        // errorText: "must provide an email",
         filled: true,
         fillColor: Theme.of(context).colorScheme.secondaryContainer,
         border: OutlineInputBorder(

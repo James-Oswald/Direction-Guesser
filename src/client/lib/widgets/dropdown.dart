@@ -4,13 +4,11 @@ class Themed_DropdownButton extends StatefulWidget {
   Themed_DropdownButton({
     required this.icon,
     required this.hintText,
-    required this.obscured,
     required this.list,
   }) : super();
 
   final Icon icon;
   final String hintText;
-  final bool obscured;
   final List<String> list;
 
   @override
@@ -37,7 +35,6 @@ class Themed_DropdownButtonState extends State<Themed_DropdownButton> {
       textStyle: TextStyle(
         fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
         fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
-        color: Theme.of(context).colorScheme.outline,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

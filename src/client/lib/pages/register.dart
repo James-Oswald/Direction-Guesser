@@ -1,7 +1,7 @@
-import 'package:direction_guesser/theme.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:direction_guesser/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class RegisterPage extends StatelessWidget {
 
@@ -9,12 +9,8 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.lightScheme()),
-      darkTheme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.darkScheme()),
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: Builder(
+    return Scaffold(
+      body: Builder(
         builder: (context) {
           return Container(
             decoration: BoxDecoration(
@@ -39,7 +35,7 @@ class RegisterPage extends StatelessWidget {
                       width: 300,
                       height: 300,
                     ),
-                    Spacer(),
+                    SizedBox(height: 16),
                     SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
@@ -68,27 +64,27 @@ class RegisterPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
-                        icon: Icon(
-                          Icons.key_rounded,
-                          color: Theme.of(context).colorScheme.onSecondaryContainer,
-                        ),
-                        hintText: "password",
-                        obscured: true
+                      icon: Icon(
+                        Icons.key_rounded,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                      hintText: "password",
+                      obscured: true
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.8,
+                    width: MediaQuery.of(context).size.width * 0.75,
                     child: Text(
                       "Optional demographic information is collected for research purposes.",
                       textAlign: TextAlign.left,
-                      style: TextStyle( 
-                          fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
-                          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
-                          color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
+                      style: TextStyle(
+                        fontStyle: Theme.of(context).textTheme.bodySmall?.fontStyle,
+                        fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
+                        color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.outline
                       ),
                     ),
                   ),
-                  SizedBox(height: 32,),
+                  SizedBox(height: 16),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: Column(
@@ -97,21 +93,43 @@ class RegisterPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text("age:", style: TextStyle(
-                                fontStyle: Theme.of(context).textTheme.headlineSmall?.fontStyle,
-                                fontSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
-                                color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
+                              fontStyle: Theme.of(context).textTheme.bodySmall?.fontStyle,
+                              fontSize: 22,
+                              color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
                             )),
-                            SizedBox(width: 12,),
+                            SizedBox(width: 12),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.45,
+                              width: 128,
                               height: 64,
-                              child: TextEntryPill(
-                                  icon: Icon(
+                              child: TextField(
+                                textAlignVertical: TextAlignVertical.center,
+                                style: TextStyle(
+                                  fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                                  fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: "age",
+                                  hintStyle: TextStyle(
+                                    fontStyle: Theme.of(context).textTheme.labelMedium?.fontStyle,
+                                    fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
+                                    color: Theme.of(context).colorScheme.outline
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(context).colorScheme.secondaryContainer,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(1000.0),
+                                    borderSide: BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
+                                    ),
+                                  ),
+                                  prefixIcon: Icon(
                                     Icons.cake_rounded,
                                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                                   ),
-                                  hintText: "age",
-                                  obscured: false
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               ),
                             ),
                           ],
@@ -120,22 +138,21 @@ class RegisterPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text("gender:", style: TextStyle(
-                                fontStyle: Theme.of(context).textTheme.headlineSmall?.fontStyle,
-                                fontSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
-                                color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
+                              fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                              fontSize: 22,
+                              color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
                             )),
-                            SizedBox(width: 12,),
+                            SizedBox(width: 12),
                             SizedBox(
                               height: 64,
-                              width: MediaQuery.of(context).size.width * 0.45,
+                              width: 128,
                               child: Themed_DropdownButton(
                                 icon: Icon(
                                 Icons.wc_rounded,
                                 color: Theme.of(context).colorScheme.onSecondaryContainer,
                                 ),
-                                list: ["M","F","O"],
-                                  hintText: "gender",
-                                  obscured: false,
+                                list: const ["M","F","O"],
+                                  hintText: ""
                               )
                             ),
                           ],
@@ -143,35 +160,40 @@ class RegisterPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 64),
-
+                  SizedBox(height: 24),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "Poop?",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontStyle: Theme.of(context).textTheme.headlineSmall?.fontStyle,
-                          fontSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
-                          color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surfaceTint
-                        ),
+                      FilledButton(
+                        onPressed: (){Navigator.pushReplacementNamed(context, '/login');}, // TODO: REST API signup call
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                              fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                              fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
+                          ),
+                          selectionColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        )
                       ),
                       SizedBox(width: 24),
                       FilledButton(
-                          onPressed: (){Navigator.pushReplacementNamed(context, '/register');}, // TODO: REST API signup call
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        onPressed: (){Navigator.pushReplacementNamed(context, '/register');}, // TODO: REST API signup call
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        child: Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+                              fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
                           ),
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
-                                fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
-                            ),
-                            selectionColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                          )
+                          selectionColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        )
                       ),
                     ],
                   ),

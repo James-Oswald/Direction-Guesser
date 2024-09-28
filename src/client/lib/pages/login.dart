@@ -1,7 +1,5 @@
-import 'package:direction_guesser/theme.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
-import 'package:direction_guesser/routes.dart';
 
 class LoginPage extends StatelessWidget {
 
@@ -9,13 +7,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.lightScheme()),
-      darkTheme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.darkScheme()),
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: generateRoute,
-      home: Builder(
+    return Scaffold(
+      body: Builder(
         builder: (context) {
           return Container(
             decoration: BoxDecoration(
