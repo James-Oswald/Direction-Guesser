@@ -126,15 +126,15 @@ class RegisterPage extends StatelessWidget {
                             )),
                             SizedBox(width: 12,),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.45,
                               height: 64,
+                              width: MediaQuery.of(context).size.width * 0.45,
                               child: Themed_DropdownButton(
                                 icon: Icon(
                                 Icons.wc_rounded,
                                 color: Theme.of(context).colorScheme.onSecondaryContainer,
                                 ),
                                 list: ["M","F","O"],
-                                  hintText: "age",
+                                  hintText: "gender",
                                   obscured: false,
                               )
                             ),
