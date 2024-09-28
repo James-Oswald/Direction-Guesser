@@ -1,4 +1,3 @@
-import 'package:direction_guesser/theme.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
 
@@ -8,12 +7,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.lightScheme()),
-      darkTheme: MaterialTheme(Theme.of(context).textTheme).theme(MaterialTheme.darkScheme()),
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: Builder(
+    return Scaffold(
+      body: Builder(
         builder: (context) {
           return Container(
             decoration: BoxDecoration(
@@ -111,7 +106,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       SizedBox(width: 24),
                       FilledButton(
-                          onPressed: () => {}, // TODO: REST API signup call
+                          onPressed: (){Navigator.pushNamed(context, '/register');}, // TODO: REST API signup call
                           style: FilledButton.styleFrom(
                             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,

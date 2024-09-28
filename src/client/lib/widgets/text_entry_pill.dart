@@ -24,10 +24,9 @@ class TextEntryPill extends StatelessWidget {
         hintText: hintText,
         hintStyle: TextStyle(
           fontStyle: Theme.of(context).textTheme.labelMedium?.fontStyle,
-            fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
+          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
           color: Theme.of(context).colorScheme.outline
         ),
-        // errorText: "must provide an email",
         filled: true,
         fillColor: Theme.of(context).colorScheme.secondaryContainer,
         border: OutlineInputBorder(
