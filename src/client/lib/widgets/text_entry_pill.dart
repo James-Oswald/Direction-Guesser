@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class TextEntryPill extends StatelessWidget {
   const TextEntryPill({
+    required this.controller,
     required this.icon,
     required this.hintText,
     required this.obscured
@@ -10,10 +11,12 @@ class TextEntryPill extends StatelessWidget {
   final Icon icon;
   final String hintText;
   final bool obscured;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       textAlignVertical: TextAlignVertical.center,
       obscureText: obscured,
       style: TextStyle(
