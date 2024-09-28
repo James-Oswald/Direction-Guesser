@@ -1,10 +1,10 @@
 use bastion::prelude::*;
-use ntex::web;
+use ntex::http::StatusCode;
 use ntex::web::{App, HttpRequest, HttpResponse, HttpServer, Responder};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use uuid::Uuid;
+use ntex::web;
+use serde::{Deserialize, Serialize};
 
 // user
 #[derive(Deserialize, Serialize, Clone)]
@@ -17,27 +17,28 @@ struct User
     gender: Option<String>,
 }
 // sessionId -> child process reference
-type SessionMap = Arc<Mutex<HashMap<String, ChildRef>>>;
+//type SessionMap = Arc<Mutex<HashMap<String, ChildrenRef>>>; //when bastion is implemented
+type SessionMap = Arc<Mutex<HashMap<String, String>>>; 
 // username -> User
 type UserMap = Arc<Mutex<HashMap<String, User>>>;
 
-fn spawn_user_session(username: String) -> ChildRef 
+//not for demo
+fn spawn_user_session(username: String) -> ChildrenRef 
 {
     Bastion::children(|children| 
-        {
+    {
         children.with_exec(move |ctx| 
-            {
+        {
             let username_clone = username.clone();
             async move 
             {
                 loop 
                 {
-                    let msg = ctx.recv().await?;
-                    if let Ok(task) = msg.downcast::<String>() 
+                    // user handlers
+                    if let Ok(msg) = ctx.recv().await 
                     {
-                        println!("Session for {} doing: {}", username_clone, task);
+                        // TODO
                     }
-                    ctx.reply(format!("done {}", username_clone)).unwrap();
                 }
                 Ok(())
             }
@@ -45,18 +46,42 @@ fn spawn_user_session(username: String) -> ChildRef
     })
     .expect("Failed to spawn user session")
 }
+//not for demo
+fn spawn_game_process() -> ChildrenRef 
+{
+    Bastion::children(|children| 
+    {
+        children.with_exec(|ctx| 
+            {
+            async move 
+            {
+                loop 
+                {
+                    // game handlers
+                    if let Ok(msg) = ctx.recv().await 
+                    {
+                        // TODO
+                    }
+                }
+                Ok(())
+            }
+        })
+    })
+    .expect("Failed to spawn game process")
+}
 
 async fn create_user_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
-    user_map: web::types::Data<UserMap>,) -> impl Responder 
+    user_map: web::types::State<UserMap>,) -> impl Responder 
 {
     let new_user = body.into_inner();
     let (username,) = path.into_inner();
     let mut map = user_map.lock().unwrap();
 
-    if map.contains_key(&username) {
-        return HttpResponse::build(418).body("User already exists.");
+    if map.contains_key(&username) 
+    {
+        return HttpResponse::BadRequest().body("User already exists.");
     }
 
     map.insert(username.clone(), new_user);
@@ -66,8 +91,8 @@ async fn create_user_handler(
 async fn get_user_handler(
     req: HttpRequest,
     path: web::types::Path<(String,)>,
-    user_map: web::types::Data<UserMap>,
-    session_map: web::types::Data<SessionMap>,) -> impl Responder 
+    user_map: web::types::State<UserMap>,
+    session_map: web::types::State<SessionMap>,) -> impl Responder 
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok());
@@ -79,10 +104,12 @@ async fn get_user_handler(
         {
             let session_map = session_map.lock().unwrap();
             if let Some(sess_user) = session_map.get(session_id) 
-            {
-                // if current session matches. then return full data
-                println!("Session ID matched for user {}", username);
-                return HttpResponse::Ok().json(user);
+            {// if current session matches. then return full data
+                if sess_user == &username 
+                {
+                    println!("Session ID matched for user {}", username);
+                    return HttpResponse::Ok().json(user);
+                }
             } 
         }
         // else return public data 
@@ -90,11 +117,14 @@ async fn get_user_handler(
         {
             username: user.username.clone(),
             password: String::from("***"), 
+            age: user.age.clone(),
+            email: user.email.clone(),
+            gender: user.gender.clone()
         };
-        HttpResponse::Ok().json(public_data)
+        HttpResponse::Ok().json(&public_data)
     } else 
     {
-        HttpResponse::build(403).body("User does not exist.")
+        HttpResponse::BadRequest().body("User does not exist.")
     }
 }
 
@@ -102,8 +132,8 @@ async fn update_user_handler(
     req: HttpRequest,
     path: web::types::Path<(String,)>,
     update_value: web::types::Json<String>,
-    user_map: web::types::Data<UserMap>,
-    session_map: web::types::Data<SessionMap>,) -> impl Responder 
+    user_map: web::types::State<UserMap>,
+    session_map: web::types::State<SessionMap>,) -> impl Responder 
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok());
@@ -111,21 +141,24 @@ async fn update_user_handler(
 
     if let Some(sess_user) = session_id.and_then(|sid| session_map.get(sid)) 
     {
-        let mut user_map = user_map.lock().unwrap();
-        if let Some(user) = user_map.get_mut(&username) 
+        if sess_user == &username
         {
-            user.password = update_value.into_inner(); //whatever we want update to do, just pw rn
-            return HttpResponse::Ok().json(user); 
+            let mut user_map = user_map.lock().unwrap();
+            if let Some(user) = user_map.get_mut(&username) 
+            {
+                user.password = update_value.into_inner(); //whatever we want update to do, just pw rn
+                return HttpResponse::Ok().json(user); 
+            }
         }
     }
-    HttpResponse::build(403).body("Incorrect sessionId for user.")
+    HttpResponse::Unauthorized().body("Incorrect sessionId for user.")
 }
 
 async fn login_user_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
-    user_map: web::types::Data<UserMap>,
-    session_map: web::types::Data<SessionMap>,) -> impl Responder 
+    user_map: web::types::State<UserMap>,
+    session_map: web::types::State<SessionMap>,) -> impl Responder 
 {
     let login_user = body.into_inner();
     let (username,) = path.into_inner();
@@ -135,12 +168,13 @@ async fn login_user_handler(
     {
         if user.password == login_user.password 
         {
-            // generate new session ID -> spawns a child process for the user session -> stores the session ID and child pid
-            let session_id = Uuid::new_v4().to_string();
-            let session_process = spawn_user_session(username.clone());
+            let session_id = format!("session-{}", username); //will revamp session ID generation to be better when 
+
             let mut session_map = session_map.lock().unwrap();
-            session_map.insert(session_id.clone(), session_process);
-            return HttpResponse::Ok().json(session_id); //returns id token
+            session_map.insert(session_id.clone(), username.clone());
+
+            // 5. Return the session ID as the token to the client
+            return HttpResponse::Ok().json(&session_id);
         }
     }
     HttpResponse::BadRequest().body("Invalid username/password combination.")
@@ -148,11 +182,9 @@ async fn login_user_handler(
 
 async fn logout_user_handler(
     body: web::types::Json<String>,
-    path: web::types::Path<(String,)>,
-    session_map: web::types::Data<SessionMap>,) -> impl Responder 
+    session_map: web::types::State<SessionMap>,) -> impl Responder 
 {
     let session_id = body.into_inner();
-    let (username,) = path.into_inner();
     let mut session_map = session_map.lock().unwrap();
 
     if session_map.remove(&session_id).is_some() 
@@ -170,27 +202,35 @@ async fn main() -> std::io::Result<()>
     Bastion::init();
     Bastion::start();
 
-    // sharing state
-    let user_map = web::types::Data::new(Arc::new(Mutex::new(HashMap::new())));
-    let session_map = web::types::Data::new(Arc::new(Mutex::new(HashMap::new())));
+   
+    let user_map: Arc<Mutex<HashMap<String, User>>> = Arc::new(Mutex::new(HashMap::new()));
+    let session_map: Arc<Mutex<HashMap<String, ChildrenRef>>> = Arc::new(Mutex::new(HashMap::new()));
 
     //hardcoded test user
     {
         let mut users = user_map.lock().unwrap();
         users.insert(
             "user1".to_string(),
-            User {
+            User 
+            {
                 username: "user".to_string(),
                 password: "password".to_string(),
+                age: None,
+                email: None,
+                gender: None
             },
         );
     }
 
     HttpServer::new(move || 
     {
+         // cloning arc to share it // shared ownership rust closure bs, but it doesnt error anymore
+        let user_map_clone = user_map.clone();     
+        let session_map_clone = session_map.clone();
+
         App::new()
-            .app_data(user_map.clone()) 
-            .app_data(session_map.clone()) 
+            .state(user_map_clone)
+            .state(session_map_clone)
             .service(
                 web::resource("/users/{username}")
                     .route(web::post().to(create_user_handler)) // Create user
