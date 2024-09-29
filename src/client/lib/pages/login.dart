@@ -91,20 +91,35 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   FilledButton(
-                      onPressed: () => {
-                        context.read<usersServices>().loginUser(usernameController.text, passwordController.text).then((value) {
-                          if (value) {
-                            Navigator.pushNamed(context, '/home');
-                          } else {
+                        onPressed: () async {
+                          // Use async/await for better readability and error handling
+                          bool isLoggedIn = await context.read<usersServices>().loginUser(
+                            usernameController.text,
+                            passwordController.text// assuming genderController is a TextEditingController
+                          );
+
+                          // Check the result of registration
+                          if (isLoggedIn) {
+                            // Show success message and navigate back to login
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Invalid username or password'),
+                                content: Text('Login successful!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+
+                            // Navigate back to login page
+                            Navigator.pushNamed(context, '/home');
+                          } else {
+                            // Show failure message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login failed. Please try again.'),
                                 backgroundColor: Theme.of(context).colorScheme.error,
                               ),
                             );
                           }
-                        })
-                      }, // TODO: REST API login call
+                        }, // TODO: REST API login call
                       style: FilledButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,

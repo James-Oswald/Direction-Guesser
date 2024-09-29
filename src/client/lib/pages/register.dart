@@ -201,8 +201,35 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       SizedBox(width: 24),
                       FilledButton(
-                        onPressed: (){
-                          context.read<usersServices>().registerUser(usernameController.text, emailController.text, passwordController.text, ageController.text, genderController);
+                        onPressed: () async {
+                          // Use async/await for better readability and error handling
+                          bool isRegistered = await context.read<usersServices>().registerUser(
+                            usernameController.text,
+                            emailController.text,
+                            passwordController.text
+                            //TODO: Add age, gender
+                          );
+
+                          // Check the result of registration
+                          if (isRegistered) {
+                            // Show success message and navigate back to login
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Registration successful! Please log in.'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            // Navigate back to login page
+                            Navigator.pop(context);
+                          } else {
+                            // Show failure message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Registration failed. Please try again.'),
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
                         }, // TODO: REST API signup call
                         style: FilledButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
