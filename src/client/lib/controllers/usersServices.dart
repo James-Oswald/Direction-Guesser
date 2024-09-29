@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,7 +7,7 @@ class usersServices{
 
   Future<bool> loginUser(String username, String password) async {
 
-    final url = Uri.parse('http://10.0.2.2:8080/users/login');
+    final url = Uri.parse('http://10.0.2.2:8080/users/$username/login');
 
     final body = jsonEncode({
       'username': username,
@@ -16,9 +17,12 @@ class usersServices{
     // Send POST request to /login
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/JSON'},
       body: body,
     );
+
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -26,7 +30,7 @@ class usersServices{
 
       // Store the session ID in shared preferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('session_id', sessionId);
+      await prefs.setString('sessionId', sessionId);
 
       return true;
     } else {
@@ -73,7 +77,7 @@ class usersServices{
       return false;
     }
 
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username/get_user_handler');
+    final url = Uri.parse('http://10.0.2.2:8080/users/$username');
 
     // Send GET request with session ID in headers
     final response = await http.get(
@@ -94,24 +98,27 @@ class usersServices{
     }
   }
 
-  Future<bool> registerUser(String username, String email, String password, String? age, String? gender) async {
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username/create_user_handler');
-    
+  Future<bool> registerUser(String username, String email, String password) async {
+    final url = Uri.parse('http://10.0.2.2:8080/users/$username');
+
     // Create JSON body for the request
     final body = jsonEncode({
       'username': username,
       'email': email,
-      'password': password,
-      'age':  age,
-      'gender': gender
+      'password': password
     });
+
+    print(body);
 
     // Send POST request to /user/create
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/JSON'},
       body: body,
     );
+
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       return true;
@@ -119,4 +126,5 @@ class usersServices{
       return false;
     }
   }
+  //TODO: Implement updateUser method
 }
