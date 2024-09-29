@@ -16,11 +16,17 @@ struct User
     age: Option<u32>,
     gender: Option<String>,
 }
+
 // sessionId -> child process reference
 //type SessionMap = Arc<Mutex<HashMap<String, ChildrenRef>>>; //when bastion is implemented
-type SessionMap = Arc<Mutex<HashMap<String, String>>>;
+type SessionMap = Mutex<HashMap<String, String>>;
 // username -> User
-type UserMap = Arc<Mutex<HashMap<String, User>>>;
+type UserMap = Mutex<HashMap<String, User>>;
+
+struct Store {
+    session_map: SessionMap,
+    user_map: UserMap,
+}
 
 //not for demo
 fn spawn_user_session(username: String) -> ChildrenRef
@@ -73,11 +79,11 @@ fn spawn_game_process() -> ChildrenRef
 async fn post_user_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
-    user_map: web::types::State<UserMap>,) -> impl Responder
+    store: web::types::State<Arc<Store>>) -> impl Responder
 {
     let new_user = body.into_inner();
     let (username,) = path.into_inner();
-    let mut map = user_map.lock().unwrap();
+    let mut map = store.user_map.lock().unwrap();
 
     if map.contains_key(&username) {
         return HttpResponse::BadRequest().body("User already exists.");
@@ -90,14 +96,13 @@ async fn post_user_handler(
 async fn get_user_handler(
     req: HttpRequest,
     path: web::types::Path<(String,)>,
-    user_map: web::types::State<UserMap>,
-    session_map: web::types::State<SessionMap>,) -> impl Responder
+    store: web::types::State<Arc<Store>>,) -> impl Responder
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok()).unwrap();
 
-    let user_map = user_map.lock().unwrap();
-    let session_map = session_map.lock().unwrap();
+    let user_map = store.user_map.lock().unwrap();
+    let session_map = store.session_map.lock().unwrap();
 
 
     if let (Some(user), Some(sess_user)) = (user_map.get(&username), session_map.get(session_id)) {
@@ -125,14 +130,13 @@ async fn put_user_handler(
     req: HttpRequest,
     path: web::types::Path<(String,)>,
     update_value: web::types::Json<String>,
-    user_map: web::types::State<UserMap>,
-    session_map: web::types::State<SessionMap>,) -> impl Responder
+    store: web::types::State<Arc<Store>>,) -> impl Responder
 {
     let (username,) = path.into_inner();
     let session_id = req.headers().get("SessionID").and_then(|val| val.to_str().ok());
 
-    let session_map = session_map.lock().unwrap();
-    let mut user_map = user_map.lock().unwrap();
+    let session_map = store.session_map.lock().unwrap();
+    let mut user_map = store.user_map.lock().unwrap();
 
     if let (Some(user), Some(sess_user)) = (user_map.get_mut(&username), session_id.and_then(|sid| session_map.get(sid))) {
         if sess_user == &username {
@@ -149,12 +153,11 @@ async fn put_user_handler(
 async fn post_user_login_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
-    user_map: web::types::State<UserMap>,
-    session_map: web::types::State<SessionMap>,) -> impl Responder
+    store: web::types::State<Arc<Store>>,) -> impl Responder
 {
     let login_user = body.into_inner();
     let (username,) = path.into_inner();
-    let map = user_map.lock().unwrap();
+    let map = store.user_map.lock().unwrap();
 
     if let Some(user) = map.get(&username)
     {
@@ -162,7 +165,7 @@ async fn post_user_login_handler(
         {
             let session_id = format!("session-{}", username); //will revamp session ID generation to be better when
 
-            let mut session_map = session_map.lock().unwrap();
+            let mut session_map = store.session_map.lock().unwrap();
             session_map.insert(session_id.clone(), username.clone());
             return HttpResponse::Ok().json(&session_id); //returns id token
         } else {
@@ -175,10 +178,10 @@ async fn post_user_login_handler(
 
 async fn post_user_logout_handler(
     body: web::types::Json<String>,
-    session_map: web::types::State<SessionMap>,) -> impl Responder
+    store: web::types::State<Arc<Store>>,) -> impl Responder
 {
     let session_id = body.into_inner();
-    let mut session_map = session_map.lock().unwrap();
+    let mut session_map = store.session_map.lock().unwrap();
 
     if session_map.remove(&session_id).is_some() {
         return HttpResponse::Ok().body("User successfully logged out.")
@@ -193,12 +196,14 @@ async fn main() -> std::io::Result<()>
     Bastion::init();
     Bastion::start();
 
-    let user_map: Arc<Mutex<HashMap<String, User>>> = Arc::new(Mutex::new(HashMap::new()));
-    let session_map: Arc<Mutex<HashMap<String, ChildrenRef>>> = Arc::new(Mutex::new(HashMap::new()));
+    let store = Arc::new(Store {
+        user_map: Mutex::new(HashMap::new()),
+        session_map: Mutex::new(HashMap::new()),
+    });
 
     //hardcoded test user
     {
-        let mut users = user_map.lock().unwrap();
+        let mut users = store.user_map.lock().unwrap();
         users.insert(
             "user1".to_string(),
             User
@@ -215,12 +220,10 @@ async fn main() -> std::io::Result<()>
     HttpServer::new(move ||
     {
          // cloning arc to share it // shared ownership rust closure bs, but it doesnt error anymore
-        let user_map_clone = user_map.clone();
-        let session_map_clone = session_map.clone();
+        let store_clone = store.clone();
 
         App::new()
-            .state(user_map_clone)
-            .state(session_map_clone)
+            .state(store_clone)
             .service(
                 web::resource("/users/{username}")
                     .route(web::post().to(post_user_handler))
