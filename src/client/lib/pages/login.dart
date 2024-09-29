@@ -1,9 +1,21 @@
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
+import 'package:direction_guesser/controllers/usersServices.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
 
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +50,12 @@ class LoginPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
+                      controller: usernameController,
                       icon: Icon(
-                        Icons.email_rounded,
+                        Icons.person_rounded,
                         color: Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
-                      hintText: "email",
+                      hintText: "username",
                       obscured: false,
                     ),
                   ),
@@ -51,6 +64,7 @@ class LoginPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
+                        controller: passwordController,
                         icon: Icon(
                           Icons.key_rounded,
                           color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -77,7 +91,35 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                   FilledButton(
-                      onPressed: () => {}, // TODO: REST API login call
+                        onPressed: () async {
+                          // Use async/await for better readability and error handling
+                          bool isLoggedIn = await context.read<usersServices>().loginUser(
+                            usernameController.text,
+                            passwordController.text// assuming genderController is a TextEditingController
+                          );
+
+                          // Check the result of registration
+                          if (isLoggedIn) {
+                            // Show success message and navigate back to login
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login successful!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+
+                            // Navigate back to login page
+                            Navigator.pushNamed(context, '/home');
+                          } else {
+                            // Show failure message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login failed. Please try again.'),
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
+                        }, // TODO: REST API login call
                       style: FilledButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,

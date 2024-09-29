@@ -5,22 +5,23 @@ class Themed_DropdownButton extends StatefulWidget {
     required this.icon,
     required this.hintText,
     required this.list,
+    required this.controller,
   }) : super();
 
   final Icon icon;
   final String hintText;
   final List<String> list;
+  String? controller;
 
   @override
   State<Themed_DropdownButton> createState() => Themed_DropdownButtonState();
 }
 
 class Themed_DropdownButtonState extends State<Themed_DropdownButton> {
-  String? dropdownValue;
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
-      initialSelection: dropdownValue, // Similar to `value` in DropdownButton
+      initialSelection: widget.controller, // Similar to `value` in DropdownButton
       dropdownMenuEntries: widget.list.map((String value) {
         return DropdownMenuEntry<String>(
           value: value,
@@ -29,7 +30,7 @@ class Themed_DropdownButtonState extends State<Themed_DropdownButton> {
       }).toList(),
       onSelected: (String? value) {
         setState(() {
-          dropdownValue = value;
+          widget.controller = value;
         });
       },
       textStyle: TextStyle(

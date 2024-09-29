@@ -1,11 +1,26 @@
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:direction_guesser/widgets/dropdown.dart';
+import 'package:direction_guesser/controllers/usersServices.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
 
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  String? genderController;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +55,7 @@ class RegisterPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
+                      controller: usernameController,
                       icon: Icon(
                         Icons.person,
                         color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -52,6 +68,7 @@ class RegisterPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
+                      controller: emailController,
                       icon: Icon(
                         Icons.email_rounded,
                         color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -64,6 +81,7 @@ class RegisterPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: 64,
                     child: TextEntryPill(
+                      controller: passwordController,
                       icon: Icon(
                         Icons.key_rounded,
                         color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -102,6 +120,7 @@ class RegisterPage extends StatelessWidget {
                               width: 128,
                               height: 64,
                               child: TextField(
+                                controller: ageController,
                                 textAlignVertical: TextAlignVertical.center,
                                 style: TextStyle(
                                   fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
@@ -147,6 +166,7 @@ class RegisterPage extends StatelessWidget {
                               height: 64,
                               width: 128,
                               child: Themed_DropdownButton(
+                                controller: genderController,
                                 icon: Icon(
                                 Icons.wc_rounded,
                                 color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -181,7 +201,36 @@ class RegisterPage extends StatelessWidget {
                       ),
                       SizedBox(width: 24),
                       FilledButton(
-                        onPressed: (){}, // TODO: REST API signup call
+                        onPressed: () async {
+                          // Use async/await for better readability and error handling
+                          bool isRegistered = await context.read<usersServices>().registerUser(
+                            usernameController.text,
+                            emailController.text,
+                            passwordController.text
+                            //TODO: Add age, gender
+                          );
+
+                          // Check the result of registration
+                          if (isRegistered) {
+                            // Show success message and navigate back to login
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Registration successful! Please log in.'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            // Navigate back to login page
+                            Navigator.pop(context);
+                          } else {
+                            // Show failure message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Registration failed. Please try again.'),
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
+                        }, // TODO: REST API signup call
                         style: FilledButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
