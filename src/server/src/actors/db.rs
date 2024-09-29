@@ -21,14 +21,21 @@ pub struct Actor {
 
 impl Actor {
     pub fn new(dump_pathname: &'static str) -> Self {
-        return Actor {
+        let mut new = Self {
             dump_pathname,
             rows: BTreeMap::new(),
         };
+        new.undump();
+
+        return new;
     }
 
     pub fn insert(&mut self, key: impl ToString, value: impl ToString) -> Option<V> {
-        return self.rows.insert(key.to_string(), value.to_string());
+        let result =
+            self.rows.insert(key.to_string(), value.to_string());
+        self.dump();
+
+        return result;
     }
 
     pub fn get(&mut self, key: &PK) -> Option<&V> {
