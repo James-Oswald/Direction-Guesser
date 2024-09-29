@@ -70,7 +70,7 @@ fn spawn_game_process() -> ChildrenRef
     .expect("Failed to spawn game process")
 }
 
-async fn pos_user_handler(
+async fn post_user_handler(
     body: web::types::Json<User>,
     path: web::types::Path<(String,)>,
     user_map: web::types::State<UserMap>,) -> impl Responder
@@ -223,7 +223,7 @@ async fn main() -> std::io::Result<()>
             .state(session_map_clone)
             .service(
                 web::resource("/users/{username}")
-                    .route(web::post().to(pos_user_handler))
+                    .route(web::post().to(post_user_handler))
                     .route(web::get().to(get_user_handler))
                     .route(web::put().to(put_user_handler))
             )
