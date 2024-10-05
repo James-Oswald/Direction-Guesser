@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../main.dart';
@@ -14,6 +15,7 @@ class CameraTestPage extends StatefulWidget {
 class _CameraTestPageState extends State<CameraTestPage> {
   late CameraController controller;
   ValueNotifier<String> position = ValueNotifier("No position.");
+  double heading = 0.0;
 
   @override
   void initState() {
@@ -44,25 +46,28 @@ class _CameraTestPageState extends State<CameraTestPage> {
       return Container();
     } else {
       return Column(children: [
+        Spacer(),
         Stack(children: [
           Center(child: CameraPreview(controller)),
           // Use a row to center the vertical divider in the center of the
           // screen regardless of screen dimensions
-          Row(children: const [
-            Spacer(),
-            VerticalDivider(color: Colors.red, thickness: 2),
-            Spacer()
-          ])
+          Center(
+            child: VerticalDivider(color: Colors.red, thickness: 2),
+          )
         ]),
         FilledButton(
             onPressed: onGetPositionTapped, child: Text("Get Position")),
+        ElevatedButton(
+            onPressed: onGetHeadingTapped,
+            child: Text('Get Heading')),
         ValueListenableBuilder<String>(
           valueListenable: position,
           builder: (BuildContext context, String value, child) {
-            return Text("Current position: $value",
+            return Text("Current position: $value\nCurrent heading: $heading",
                 style: TextStyle(fontSize: 12));
           },
         ),
+        Spacer()
       ]);
     }
   }
@@ -73,5 +78,13 @@ class _CameraTestPageState extends State<CameraTestPage> {
       position = ValueNotifier(location.toString());
     });
     print(position);
+  }
+
+  Future<void> onGetHeadingTapped() async {
+    var direction = await FlutterCompass.events?.first;
+    setState(() {
+      heading = (direction?.heading)!;
+    });
+    print(heading);
   }
 }
