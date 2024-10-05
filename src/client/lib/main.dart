@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:direction_guesser/theme.dart';
 import 'package:direction_guesser/controllers/usersServices.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'routes.dart';
 
-void main() {
+List<CameraDescription> cameras = [];
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   runApp(
     MultiProvider(providers: [
       Provider(create: (_) => usersServices())
@@ -24,7 +29,7 @@ class MainApp extends StatelessWidget {
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute, 
-      initialRoute: CheckSessionStatus() ? '/home' : '/login'
+      initialRoute: CheckSessionStatus() ? '/home' : '/camera'
     );
   }
 }
