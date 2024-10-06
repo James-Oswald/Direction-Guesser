@@ -9,7 +9,8 @@ defmodule App.Application do
   def start(_type, _args) do
     children = [
       App.DB,
-      App.User.Supervisor,
+      App.User,
+      App.Auth,
       AppWeb.Endpoint,
     ]
 

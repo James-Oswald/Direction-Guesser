@@ -1,30 +1,31 @@
 defmodule App.User do
-  use GenServer
-  require Logger
+  alias App.User.Child
 
-  @private [:password]
+  use DynamicSupervisor
 
-  def get(pid) do
-    GenServer.call(pid, :get)
-  end
-
-  def start_link({user, opts}) do
-    GenServer.start_link(__MODULE__, user, opts)
-  end
-
-  def stop(reason, user) do
-    Logger.info("u#{user.id} (#{user.username}): logged out (#{reason})")
-    {:ok, user}
+  def start_link(opts) do
+    DynamicSupervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl true
-  def init(user) do
-    Logger.info("u#{user.id} (#{user.username}): logged in")
-    {:ok, user}
+  def init(_opts) do
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  @impl true
-  def handle_call(:get, _from, user) do
-    {:reply, Map.drop(user, @private), user}
+  def start_child(user) do
+    uid = String.to_atom("u#{user.id}")
+    spec = { Child, {user, name: uid} }
+
+    case DynamicSupervisor.start_child(__MODULE__, spec) do
+      {:ok, _pid} ->
+        {:ok, uid}
+      {:error, {:already_started, _pid}} ->
+        {:ok, uid}
+    end
   end
+
+  def terminate_child(user) do
+    DynamicSupervisor.terminate_child(__MODULE__, String.to_atom("u#{user.id}"))
+  end
+
 end
