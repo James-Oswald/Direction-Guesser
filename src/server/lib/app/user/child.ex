@@ -2,7 +2,7 @@ defmodule App.User.Child do
   use GenServer
   require Logger
 
-  @private [:password]
+  @private [:password, :__struct__, :__meta__]
 
   def start_link({user, opts}) do
     GenServer.start_link(__MODULE__, user, opts)

@@ -7,7 +7,10 @@ defmodule AppWeb.Endpoint do
 
   def init(_opts) do
     children = [
-      { Plug.Cowboy, scheme: :http, plug: AppWeb.Router, options: [port: Application.fetch_env!(:app, :port)] }
+      { Plug.Cowboy,
+        scheme: :http,
+        plug: AppWeb.Router,
+        options: [port: Application.fetch_env!(:app, :port)] }
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

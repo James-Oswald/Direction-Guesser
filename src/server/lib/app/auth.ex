@@ -17,7 +17,7 @@ defmodule App.Auth do
 
   def sign_up(attr) do
     %Schema{}
-    |> Schema.changeset(attr)
+    |> Schema.changeset(Enum.into(attr, %{}))
     |> DB.insert()
   end
 
