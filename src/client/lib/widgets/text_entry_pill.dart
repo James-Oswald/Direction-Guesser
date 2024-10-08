@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class TextEntryPill extends StatelessWidget {
-  const TextEntryPill({
-    required this.controller,
-    required this.icon,
-    required this.hintText,
-    required this.obscured
-  }) : super();
+  const TextEntryPill(
+      {required this.controller,
+      required this.icon,
+      required this.hintText,
+      required this.obscured})
+      : super();
 
   final Icon icon;
   final String hintText;
@@ -21,15 +21,13 @@ class TextEntryPill extends StatelessWidget {
       obscureText: obscured,
       style: TextStyle(
           fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
-          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize
-      ),
+          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          fontStyle: Theme.of(context).textTheme.labelMedium?.fontStyle,
-          fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
-          color: Theme.of(context).colorScheme.outline
-        ),
+            fontStyle: Theme.of(context).textTheme.labelMedium?.fontStyle,
+            fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
+            color: Theme.of(context).colorScheme.outline),
         filled: true,
         fillColor: Theme.of(context).colorScheme.secondaryContainer,
         border: OutlineInputBorder(

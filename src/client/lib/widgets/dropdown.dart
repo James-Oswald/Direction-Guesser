@@ -21,7 +21,8 @@ class Themed_DropdownButtonState extends State<Themed_DropdownButton> {
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
-      initialSelection: widget.controller, // Similar to `value` in DropdownButton
+      initialSelection: widget.controller,
+      // Similar to `value` in DropdownButton
       dropdownMenuEntries: widget.list.map((String value) {
         return DropdownMenuEntry<String>(
           value: value,
