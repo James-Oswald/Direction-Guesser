@@ -19,27 +19,28 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Builder(
-        builder: (context) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Theme.of(context).brightness == Brightness.light ? Color(0xFFFAF8FF) : Color(0xFF121318),
-                    Theme.of(context).brightness == Brightness.light ? Color(0xFF495D92) : Color(0xFF151B2C)
-                  ]
-              ),
-            ),
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              body: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Spacer(),
+    return Scaffold(body: Builder(builder: (context) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context).brightness == Brightness.light
+                    ? Color(0xFFFAF8FF)
+                    : Color(0xFF121318),
+                Theme.of(context).brightness == Brightness.light
+                    ? Color(0xFF495D92)
+                    : Color(0xFF151B2C)
+              ]),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Spacer(),
                     Image.asset(
                       "assets/logo.png",
                       width: 300,
