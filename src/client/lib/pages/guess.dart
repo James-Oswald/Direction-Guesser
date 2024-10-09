@@ -4,6 +4,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../main.dart';
+import '../widgets/permissions_card.dart';
 
 class GuessPage extends StatefulWidget {
   const GuessPage({super.key});
@@ -14,6 +15,7 @@ class GuessPage extends StatefulWidget {
 
 class _GuessPageState extends State<GuessPage> {
   late CameraController controller;
+  late Future<LocationPermission> locationPermissions;
   String position = "No position.";
   double heading = 0.0;
 
@@ -38,6 +40,7 @@ class _GuessPageState extends State<GuessPage> {
         }
       }
     });
+    locationPermissions = getLocationPermissions();
   }
 
   @override
@@ -59,74 +62,62 @@ class _GuessPageState extends State<GuessPage> {
                         : Color(0xFF151B2C)
                   ]),
             ),
-            child: Scaffold(
-                backgroundColor: Colors.transparent,
-                body: Center(
-                    child: Card(
-                        elevation: 6,
-                        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.75),
-                        child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text(
-                                        "Please enable camera permissions for Direction Guesser from your settings.",
-                                        style: TextStyle(
-                                            fontStyle: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
-                                                ?.fontStyle,
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
-                                                ?.fontSize),
-                                        selectionColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
-                                        textAlign: TextAlign.center,
-                                      )),
-                                  Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text(
-                                        "If your device does not have a camera,\nyou are unable to play this game.",
-                                        style: TextStyle(
-                                            fontStyle: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.fontStyle,
-                                            fontSize: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.fontSize),
-                                        selectionColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
-                                        textAlign: TextAlign.center,
-                                      )),
-                                ]))))));
+            child: PermissionsCard(
+                mainText:
+                    "Please enable camera permissions for Direction Guesser from your settings",
+                subText:
+                    "If your device does not have a camera, you are unable to play this game."));
       }));
     } else {
-      return Column(children: [
-        Spacer(),
-        Stack(children: [
-          Center(child: CameraPreview(controller)),
-          // Use a row to center the vertical divider in the center of the
-          // screen regardless of screen dimensions
-          Center(
-            child: VerticalDivider(color: Colors.red, thickness: 2),
-          )
-        ]),
-        FilledButton(
-            onPressed: onGetPositionTapped, child: Text("Get Position")),
-        ElevatedButton(
-            onPressed: onGetHeadingTapped, child: Text('Get Heading')),
-        Text("Current position: $position\nCurrent heading: $heading",
-            style: TextStyle(fontSize: 12)),
-        Spacer()
-      ]);
+      return FutureBuilder<LocationPermission>(
+          future: getLocationPermissions(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData ||
+                snapshot.data == LocationPermission.denied ||
+                snapshot.data == LocationPermission.deniedForever) {
+              return Scaffold(body: Builder(builder: (context) {
+                return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).brightness == Brightness.light
+                                ? Color(0xFFFAF8FF)
+                                : Color(0xFF121318),
+                            Theme.of(context).brightness == Brightness.light
+                                ? Color(0xFF495D92)
+                                : Color(0xFF151B2C)
+                          ]),
+                    ),
+                    child: PermissionsCard(
+                        mainText:
+                            "Please enable location permissions for Direction Guesser from your settings",
+                        subText:
+                            "Location permissions are needed to determine your coordinates and heading."));
+              }));
+            } else {
+              return Column(children: [
+                Spacer(),
+                Stack(children: [
+                  Center(child: CameraPreview(controller)),
+                  // Use a row to center the vertical divider in the center of the
+                  // screen regardless of screen dimensions
+                  Center(
+                    child: VerticalDivider(color: Colors.red, thickness: 2),
+                  )
+                ]),
+                FilledButton(
+                    onPressed: onGetPositionTapped,
+                    child: Text("Get Position")),
+                ElevatedButton(
+                    onPressed: onGetHeadingTapped, child: Text('Get Heading')),
+                Text("Current position: $position\nCurrent heading: $heading",
+                    style: TextStyle(fontSize: 12)),
+                Spacer()
+              ]);
+            }
+          });
     }
   }
 
@@ -142,5 +133,9 @@ class _GuessPageState extends State<GuessPage> {
     setState(() {
       heading = (direction?.heading)!;
     });
+  }
+
+  Future<LocationPermission> getLocationPermissions() async {
+    return await Geolocator.checkPermission();
   }
 }
