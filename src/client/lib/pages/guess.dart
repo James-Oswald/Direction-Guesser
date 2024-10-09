@@ -60,23 +60,19 @@ class _GuessPageState extends State<GuessPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Theme
-                        .of(context)
-                        .brightness == Brightness.light
+                    Theme.of(context).brightness == Brightness.light
                         ? Color(0xFFFAF8FF)
                         : Color(0xFF121318),
-                    Theme
-                        .of(context)
-                        .brightness == Brightness.light
+                    Theme.of(context).brightness == Brightness.light
                         ? Color(0xFF495D92)
                         : Color(0xFF151B2C)
                   ]),
             ),
             child: PermissionsCard(
                 mainText:
-                "Please enable camera permissions for Direction Guesser from your settings",
+                    "Please enable camera permissions for Direction Guesser from your settings",
                 subText:
-                "If your device does not have a camera, you are unable to play this game."));
+                    "If your device does not have a camera, you are unable to play this game."));
       }));
     } else {
       return FutureBuilder<LocationPermission>(
@@ -92,34 +88,29 @@ class _GuessPageState extends State<GuessPage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Theme
-                                .of(context)
-                                .brightness == Brightness.light
+                            Theme.of(context).brightness == Brightness.light
                                 ? Color(0xFFFAF8FF)
                                 : Color(0xFF121318),
-                            Theme
-                                .of(context)
-                                .brightness == Brightness.light
+                            Theme.of(context).brightness == Brightness.light
                                 ? Color(0xFF495D92)
                                 : Color(0xFF151B2C)
                           ]),
                     ),
                     child: PermissionsCard(
                         mainText:
-                        "Please enable location permissions for Direction Guesser from your settings",
+                            "Please enable location permissions for Direction Guesser from your settings",
                         subText:
-                        "Location permissions are needed to determine your coordinates and heading."));
+                            "Location permissions are needed to determine your coordinates and heading."));
               }));
             } else {
               return Column(children: [
                 Spacer(),
                 Stack(children: [
                   Center(child: CameraPreview(controller)),
-                  // Use a row to center the vertical divider in the center of the
-                  // screen regardless of screen dimensions
-                  Center(
-                    child: VerticalDivider(color: Colors.red, thickness: 2),
-                  )
+                  Positioned.fill(
+                      child: Center(
+                          child: VerticalDivider(
+                              color: Colors.red, thickness: 2))),
                 ]),
                 FilledButton(
                     onPressed: () => submitGuess(context),
@@ -146,12 +137,11 @@ class _GuessPageState extends State<GuessPage> {
     final prefs = await SharedPreferences.getInstance();
     final sessionId = prefs.getString('session_id');
     bool guessSentSuccessfully = await context.read<GameServices>().sendGuess(
-      // TODO: this cast should go away when we refactor to uints for session_id
+        // TODO: this cast should go away when we refactor to uints for session_id
         sessionId as UnsignedInt,
         latitude,
         longitude,
-        heading
-    );
+        heading);
 
     // Check the result of sending the guess
     if (guessSentSuccessfully) {
@@ -162,8 +152,7 @@ class _GuessPageState extends State<GuessPage> {
           backgroundColor: Colors.green,
         ),
       );
-    }
-    else {
+    } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
