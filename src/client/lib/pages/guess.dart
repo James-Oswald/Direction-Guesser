@@ -103,23 +103,99 @@ class _GuessPageState extends State<GuessPage> {
                             "Location permissions are needed to determine your coordinates and heading."));
               }));
             } else {
-              return Column(children: [
-                Spacer(),
-                Stack(children: [
-                  Center(child: CameraPreview(controller)),
-                  Positioned.fill(
-                      child: Center(
-                          child: VerticalDivider(
-                              color: Colors.red, thickness: 2))),
-                ]),
-                FilledButton(
-                    onPressed: () => submitGuess(context),
-                    child: Text("Get Position")),
-                Text(
-                    "Current position: $latitude : $longitude\nCurrent heading: $heading",
-                    style: TextStyle(fontSize: 12)),
-                Spacer()
-              ]);
+              return Scaffold(body: Builder(builder: (context) {
+                return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).brightness == Brightness.light
+                                ? Color(0xFFFAF8FF)
+                                : Color(0xFF121318),
+                            Theme.of(context).brightness == Brightness.light
+                                ? Color(0xFF495D92)
+                                : Color(0xFF151B2C)
+                          ]),
+                    ),
+                    child: Scaffold(
+                        backgroundColor: Colors.transparent,
+                        body: Center(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                              Spacer(),
+                              Text(
+                                  "Line up your guess using the camera as a guide.",
+                                  style: TextStyle(
+                                      fontStyle: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.fontStyle,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.fontSize,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .surfaceTint)),
+                              SizedBox(height: 16),
+                              Center(
+                                  child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow:  [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.5),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 8))
+                                          ]),
+                                      child: Stack(children: [
+                                        ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: CameraPreview(controller)),
+                                        Positioned.fill(
+                                            child: Center(
+                                                child: VerticalDivider(
+                                                    color: Colors.red,
+                                                    thickness: 2))),
+                                      ]))),
+                              SizedBox(height: 16),
+                              FilledButton(
+                                  onPressed: () => submitGuess(context),
+                                  child: Text("Get Position")),
+                              SizedBox(height: 16),
+                              Text(
+                                  "Current position: $latitude : $longitude\nCurrent heading: $heading",
+                                  style: TextStyle(
+                                      fontStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.fontStyle,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.fontSize,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .surfaceTint)),
+                              Spacer()
+                            ]))));
+              }));
             }
           });
     }
