@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controllers/game_services.dart';
 import '../main.dart';
-import '../widgets/permissions_card.dart';
+import '../widgets/permissions_denied_card.dart';
 
 class GuessPage extends StatefulWidget {
   const GuessPage({super.key});
@@ -68,11 +68,12 @@ class _GuessPageState extends State<GuessPage> {
                         : Color(0xFF151B2C)
                   ]),
             ),
-            child: PermissionsCard(
+            child: PermissionsDeniedCard(
                 mainText:
                     "Please enable camera permissions for Direction Guesser from your settings",
                 subText:
-                    "If your device does not have a camera, you are unable to play this game."));
+                    "Camera permissions are needed to display your surroundings when making a guess.",
+                onPressed: Geolocator.openAppSettings));
       }));
     } else {
       return FutureBuilder<LocationPermission>(
@@ -96,11 +97,12 @@ class _GuessPageState extends State<GuessPage> {
                                 : Color(0xFF151B2C)
                           ]),
                     ),
-                    child: PermissionsCard(
+                    child: PermissionsDeniedCard(
                         mainText:
                             "Please enable location permissions for Direction Guesser from your settings",
                         subText:
-                            "Location permissions are needed to determine your coordinates and heading."));
+                            "Location permissions are needed to determine your coordinates and heading.",
+                        onPressed: Geolocator.openAppSettings));
               }));
             } else {
               return Scaffold(body: Builder(builder: (context) {
@@ -152,9 +154,10 @@ class _GuessPageState extends State<GuessPage> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(20),
-                                          boxShadow:  [
+                                          boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.5),
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
                                                 blurRadius: 8,
                                                 offset: Offset(0, 8))
                                           ]),

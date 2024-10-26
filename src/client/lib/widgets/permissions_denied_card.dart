@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PermissionsCard extends StatelessWidget {
-  const PermissionsCard({required this.mainText, required this.subText})
+class PermissionsDeniedCard extends StatelessWidget {
+  const PermissionsDeniedCard({required this.mainText, required this.subText, required this.onPressed})
       : super();
 
   final String mainText;
   final String subText;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,7 @@ class PermissionsCard extends StatelessWidget {
                 child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(height: 16),
                       Padding(
                           padding: EdgeInsets.all(8),
                           child: Text(
@@ -28,11 +30,11 @@ class PermissionsCard extends StatelessWidget {
                             style: TextStyle(
                                 fontStyle: Theme.of(context)
                                     .textTheme
-                                    .bodyLarge
+                                    .titleLarge
                                     ?.fontStyle,
                                 fontSize: Theme.of(context)
                                     .textTheme
-                                    .bodyLarge
+                                    .titleLarge
                                     ?.fontSize),
                             selectionColor: Theme.of(context)
                                 .colorScheme
@@ -57,6 +59,9 @@ class PermissionsCard extends StatelessWidget {
                                 .onPrimaryContainer,
                             textAlign: TextAlign.center,
                           )),
+                      SizedBox(height: 16),
+                      FilledButton(onPressed: onPressed, child: Text("Go to Settings")),
+                      SizedBox(height: 16),
                     ])))));
   }
 }
