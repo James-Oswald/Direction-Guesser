@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 
 import 'package:camera/camera.dart';
+import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
@@ -47,12 +48,67 @@ class _GuessPageState extends State<GuessPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ValueListenableBuilder<PermissionsState>(
-            valueListenable: permissionState,
-            builder: (_, PermissionsState permissions, child) {
-              print("currentPermission: $permissions");
-              if (permissions == PermissionsState.cameraDenied) {
+    if (gpsServicesUnavailable) {
+      return Scaffold(
+        body: MissingDeviceCard(
+            mainText: "Your device is missing either GPS or a compass.",
+            subText: "Without these, you are unable to play."),
+      );
+    } else if (cameraUnavailable) {
+      return Scaffold(
+        body: MissingDeviceCard(
+            mainText: "Your device is missing a suitable camera.",
+            subText: "Without this, you are unable to play."),
+      );
+    } else {
+      return Scaffold(
+          body: ValueListenableBuilder<PermissionsState>(
+              valueListenable: permissionState,
+              builder: (_, PermissionsState permissions, child) {
+                if (permissions == PermissionsState.cameraDenied) {
+                  return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color(0xFFFAF8FF)
+                                  : Color(0xFF121318),
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color(0xFF495D92)
+                                  : Color(0xFF151B2C)
+                            ]),
+                      ),
+                      child: PermissionsDeniedCard(
+                          mainText:
+                              "Please enable camera permissions for Direction Guesser from your settings",
+                          subText:
+                              "Camera permissions are needed to display your surroundings when making a guess.",
+                          onPressed: Geolocator.openAppSettings));
+                } else if (permissions == PermissionsState.locationDenied ||
+                    permissions == PermissionsState.bothDenied) {
+                  return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color(0xFFFAF8FF)
+                                  : Color(0xFF121318),
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color(0xFF495D92)
+                                  : Color(0xFF151B2C)
+                            ]),
+                      ),
+                      child: PermissionsDeniedCard(
+                          mainText:
+                              "Please enable location permissions for Direction Guesser from your settings",
+                          subText:
+                              "Location permissions are needed to determine your coordinates and heading.",
+                          onPressed: Geolocator.openAppSettings));
+                }
                 return Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -67,118 +123,86 @@ class _GuessPageState extends State<GuessPage> {
                                 : Color(0xFF151B2C)
                           ]),
                     ),
-                    child: PermissionsDeniedCard(
-                        mainText:
-                            "Please enable camera permissions for Direction Guesser from your settings",
-                        subText:
-                            "Camera permissions are needed to display your surroundings when making a guess.",
-                        onPressed: Geolocator.openAppSettings));
-              } else if (permissions == PermissionsState.locationDenied ||
-                  permissions == PermissionsState.bothDenied) {
-                return Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Theme.of(context).brightness == Brightness.light
-                                ? Color(0xFFFAF8FF)
-                                : Color(0xFF121318),
-                            Theme.of(context).brightness == Brightness.light
-                                ? Color(0xFF495D92)
-                                : Color(0xFF151B2C)
-                          ]),
-                    ),
-                    child: PermissionsDeniedCard(
-                        mainText:
-                            "Please enable location permissions for Direction Guesser from your settings",
-                        subText:
-                            "Location permissions are needed to determine your coordinates and heading.",
-                        onPressed: Geolocator.openAppSettings));
-              }
-              return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Theme.of(context).brightness == Brightness.light
-                              ? Color(0xFFFAF8FF)
-                              : Color(0xFF121318),
-                          Theme.of(context).brightness == Brightness.light
-                              ? Color(0xFF495D92)
-                              : Color(0xFF151B2C)
-                        ]),
-                  ),
-                  child: Scaffold(
-                      backgroundColor: Colors.transparent,
-                      body: Center(
-                          child:
-                              Column(mainAxisSize: MainAxisSize.max, children: [
-                        Spacer(),
-                        Text("Line up your guess using the camera as a guide.",
-                            style: TextStyle(
-                                fontStyle: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.fontStyle,
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.fontSize,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Theme.of(context).colorScheme.surface
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceTint)),
-                        SizedBox(height: 16),
-                        Center(
-                            child: Container(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.black.withOpacity(0.5),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 8))
-                                    ]),
-                                child: Stack(children: [
-                                  ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: CameraPreview(controller)),
-                                  Positioned.fill(
-                                      child: Center(
-                                          child: VerticalDivider(
-                                              color: Colors.red,
-                                              thickness: 2))),
-                                ]))),
-                        SizedBox(height: 16),
-                        FilledButton(
-                            onPressed: () => submitGuess(context),
-                            child: Text("Get Position")),
-                        SizedBox(height: 16),
-                        Text(
-                            "Current position: $latitude : $longitude\nCurrent heading: $heading",
-                            style: TextStyle(
-                                fontStyle: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.fontStyle,
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.fontSize,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Theme.of(context).colorScheme.surface
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceTint)),
-                        Spacer()
-                      ]))));
-            }));
+                    child: Scaffold(
+                        backgroundColor: Colors.transparent,
+                        body: Center(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                              Spacer(),
+                              Text(
+                                  "Line up your guess using the camera as a guide.",
+                                  style: TextStyle(
+                                      fontStyle: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.fontStyle,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.fontSize,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .surfaceTint)),
+                              SizedBox(height: 16),
+                              Center(
+                                  child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 8))
+                                          ]),
+                                      child: Stack(children: [
+                                        ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: CameraPreview(controller)),
+                                        Positioned.fill(
+                                            child: Center(
+                                                child: VerticalDivider(
+                                                    color: Colors.red,
+                                                    thickness: 2))),
+                                      ]))),
+                              SizedBox(height: 16),
+                              FilledButton(
+                                  onPressed: () => submitGuess(context),
+                                  child: Text("Get Position")),
+                              SizedBox(height: 16),
+                              Text(
+                                  "Current position: $latitude : $longitude\nCurrent heading: $heading",
+                                  style: TextStyle(
+                                      fontStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.fontStyle,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.fontSize,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .surfaceTint)),
+                              Spacer()
+                            ]))));
+              }));
+    }
   }
 
   Future<void> submitGuess(BuildContext context) async {
