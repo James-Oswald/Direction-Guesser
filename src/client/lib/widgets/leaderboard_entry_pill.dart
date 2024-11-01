@@ -11,7 +11,6 @@ class LeaderboardEntryPill extends StatelessWidget {
       : super();
 
   final String username;
-
   // final Image profilePicture;
   final int score;
   final Rank rank;
