@@ -1,3 +1,4 @@
+import 'package:direction_guesser/widgets/currency_pill.dart';
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:flutter/material.dart';
 
@@ -27,24 +28,33 @@ class _homePageState extends State<HomePage> {
         ),
         child: Scaffold(
             backgroundColor: Colors.transparent,
-            body: Center(
-                child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  LeaderboardCard(),
-                  FilledButton(
-                      onPressed: onPressedSinglePlayer,
-                      child: Text("Single-Player")),
-                  FilledButton(
-                      onPressed: onPressedMutliPlayer,
-                      child: Text("Multi-Player"))
-                ]))));
+            body: Padding(
+              padding: EdgeInsets.all(8),
+            child: Column(mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.end, children: [
+              SizedBox(height: 64),
+              CurrencyPill(funds: 1500),
+              SizedBox(height: 64),
+              Center(
+                  child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                    LeaderboardCard(),
+                    SizedBox(height: 32),
+                    FilledButton(
+                        onPressed: onPressedSinglePlayer,
+                        child: Text("Single-Player")),
+                    FilledButton(
+                        onPressed: onPressedMultiPlayer,
+                        child: Text("Multi-Player"))
+                  ]))
+            ]))));
   }
 
   // TODO:
   void onPressedSinglePlayer() {}
 
   // TODO:
-  void onPressedMutliPlayer() {}
+  void onPressedMultiPlayer() {}
 }
