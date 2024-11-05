@@ -12,7 +12,7 @@ class LeaderboardCard extends StatelessWidget {
         child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             child: Padding(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
