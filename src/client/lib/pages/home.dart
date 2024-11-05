@@ -29,27 +29,65 @@ class _homePageState extends State<HomePage> {
         child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Padding(
-              padding: EdgeInsets.all(8),
-            child: Column(mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.end, children: [
-              SizedBox(height: 64),
-              CurrencyPill(funds: 1500),
-              SizedBox(height: 64),
-              Center(
-                  child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                    LeaderboardCard(),
-                    SizedBox(height: 32),
-                    FilledButton(
-                        onPressed: onPressedSinglePlayer,
-                        child: Text("Single-Player")),
-                    FilledButton(
-                        onPressed: onPressedMultiPlayer,
-                        child: Text("Multi-Player"))
-                  ]))
-            ]))));
+                padding: EdgeInsets.all(8),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(height: 64),
+                      CurrencyPill(funds: 1500),
+                      SizedBox(height: 32),
+                      Expanded(
+                          child:
+                              Column(mainAxisSize: MainAxisSize.max, children: [
+                        LeaderboardCard(),
+                        Spacer(),
+                        FilledButton(
+                            onPressed: onPressedSinglePlayer,
+                            child: Text("Single-Player")),
+                        FilledButton(
+                            onPressed: onPressedMultiPlayer,
+                            child: Text("Multi-Player")),
+                        Spacer(),
+                        Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              FilledButton.tonal(
+                                  onPressed: () => {}, // TODO: implement
+                                  child: Icon(
+                                    Icons.settings_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                  )),
+                              FilledButton.tonal(
+                                  onPressed: () => {}, // TODO: implement
+                                  child: Icon(
+                                    Icons.store_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                  )),
+                              FilledButton.tonal(
+                                  onPressed: () => {}, // TODO: implement
+                                  child: Icon(
+                                    Icons.star_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                  )),
+                              FilledButton.tonal(
+                                  onPressed: () => {}, // TODO: implement
+                                  child: Icon(
+                                    Icons.person_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                  ))
+                            ]),
+                                SizedBox(height: 16)
+                      ]))
+                    ]))));
   }
 
   // TODO:
