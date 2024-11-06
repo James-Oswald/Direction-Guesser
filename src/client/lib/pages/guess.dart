@@ -161,16 +161,13 @@ class _GuessPageState extends State<GuessPage> {
                                     : Theme.of(context)
                                         .colorScheme
                                         .surfaceTint)),
-                                    Text(LIES[Random().nextInt(list.length)], // TODO: this should come from the backend
+                                    Text(LIES[Random().nextInt(LIES.length)], // TODO: this should come from the backend
                             style: TextStyle(
                                 fontStyle: Theme.of(context)
                                     .textTheme
                                     .displayMedium
                                     ?.fontStyle,
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .displayMedium
-                                    ?.fontSize,
+                                fontSize: 32,
                                 color: Theme.of(context).colorScheme.error)),
                         Spacer(),
                         Text("Line up your guess using the camera as a guide.",
