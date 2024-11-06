@@ -28,7 +28,7 @@ class MainApp extends StatelessWidget {
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
         onGenerateRoute: generateRoute,
-        initialRoute: CheckSessionStatus() ? '/home' : '/home');
+        initialRoute: CheckSessionStatus() ? '/home' : '/login');
   }
 }
 
