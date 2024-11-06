@@ -20,7 +20,16 @@ defmodule App.User.Child do
   end
 
   @impl true
-  def handle_call(:get, _from, user) do
-    {:reply, Map.drop(user, @private), user}
+  def handle_call([:get], _from, user) do
+    {:reply, {:ok, Map.drop(user, @private)}, user}
+  end
+
+  @impl true
+  def handle_call([:proxy, actor, msg | msg_opts], _from, user) do
+    if (actor == String.to_atom("u#{user.id}")) do
+      handle_call([msg | msg_opts], _from, user)
+    else
+      GenServer.call(actor, [msg | msg_opts])
+    end
   end
 end

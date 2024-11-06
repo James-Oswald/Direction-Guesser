@@ -27,5 +27,4 @@ defmodule App.User do
   def terminate_child(user) do
     DynamicSupervisor.terminate_child(__MODULE__, String.to_atom("u#{user.id}"))
   end
-
 end

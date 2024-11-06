@@ -1,3 +1,1 @@
-defmodule App do
-
-end
+defmodule App do end
