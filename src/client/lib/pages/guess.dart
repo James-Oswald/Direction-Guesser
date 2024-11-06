@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:async';
 import 'dart:ffi';
 
@@ -53,6 +54,21 @@ class _GuessPageState extends State<GuessPage> {
 
   @override
   Widget build(BuildContext context) {
+    var LIES = [
+      "Foshan, People's Republic of China",
+      "Paris, France",
+      "Karachi, Pakistan",
+      "Yangon, Myanmar",
+      "Ho Chi Minh City, Vietnam",
+      "Singapore, Singapore",
+      "Sydney, Australia",
+      "São Paulo, Brazil",
+      "Hyderabad, India",
+      "Dar es Salaam, Tanzania",
+      "Rio de Janeiro, Brazil",
+      "Istanbul, Turkey"
+    ];
+
     return Scaffold(
         body: ValueListenableBuilder<PermissionsState>(
             valueListenable: permissionState,
@@ -145,7 +161,7 @@ class _GuessPageState extends State<GuessPage> {
                                     : Theme.of(context)
                                         .colorScheme
                                         .surfaceTint)),
-                        Text("PARIS, FRANCE", // TODO: this should come from the backend
+                                    Text(LIES[Random().nextInt(list.length)], // TODO: this should come from the backend
                             style: TextStyle(
                                 fontStyle: Theme.of(context)
                                     .textTheme
