@@ -34,7 +34,7 @@ class _homePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       SizedBox(height: 64),
-                      CurrencyPill(funds: 1500),
+                      CurrencyPill(funds: 15827),
                       SizedBox(height: 32),
                       Expanded(
                           child:

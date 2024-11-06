@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum Rank { first, second, third, other }
 
+final NumberFormat formatter = NumberFormat.decimalPatternDigits(
+  locale: 'en_us',
+  decimalDigits: 0,
+);
+
 class LeaderboardEntryPill extends StatelessWidget {
+
   const LeaderboardEntryPill(
       {required this.username,
-      // required this.profilePicture,
+      required this.profilePicture,
       required this.score,
       required this.rank})
       : super();
 
   final String username;
-  // final Image profilePicture;
+  final NetworkImage profilePicture;
   final int score;
   final Rank rank;
 
@@ -37,6 +44,7 @@ class LeaderboardEntryPill extends StatelessWidget {
               children: [
                 Row(children: [
                   CircleAvatar(
+                      foregroundImage: profilePicture,
                       backgroundColor:
                           Theme.of(context).colorScheme.onSecondaryContainer),
                   SizedBox(width: 16),
@@ -46,11 +54,13 @@ class LeaderboardEntryPill extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onPrimary),
                   ),
                 ]),
-                Text(
-                  "$score",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                )
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      formatter.format(score),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ))
               ],
             )));
   }

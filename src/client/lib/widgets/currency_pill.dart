@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum Rank { first, second, third, other }
+
+final NumberFormat formatter = NumberFormat.decimalPatternDigits(
+  locale: 'en_us',
+  decimalDigits: 0,
+);
 
 class CurrencyPill extends StatelessWidget {
   const CurrencyPill({required this.funds}) : super();
@@ -24,7 +30,7 @@ class CurrencyPill extends StatelessWidget {
                 ),
                 SizedBox(width: 4),
                 Text(
-                  "$funds",
+                  formatter.format(funds),
                   style: TextStyle(
                       fontStyle:
                           Theme.of(context).textTheme.labelLarge?.fontStyle,
