@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera is used to provide the user with a visual reference when making their guess.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to location when the user makes their guess.</string>
 </dict>
 </plist>
