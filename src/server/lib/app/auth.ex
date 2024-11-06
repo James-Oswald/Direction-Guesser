@@ -3,21 +3,24 @@ defmodule App.Auth do
   alias App.User
   alias App.User.Schema
 
-  def sign_in(attr) do
+  defp sign_in(attr = %{username: _, password: _}) do
     Schema
     |> DB.get_by!(attr)
     |> User.start_child
   end
 
-  def sign_out(attr) do
+  defp sign_out(uid) when is_number(uid) do
     Schema
-    |> DB.get_by!(attr)
+    |> DB.get_by!(%{id: uid})
     |> User.terminate_child
   end
 
-  def sign_up(attr) do
+  defp sign_up(attr) when is_list(attr) do
+    sign_up(Enum.into(attr, %{}))
+  end
+  defp sign_up(attr) when is_map(attr) do
     %Schema{}
-    |> Schema.changeset(Enum.into(attr, %{}))
+    |> Schema.changeset(attr)
     |> DB.insert()
   end
 
@@ -34,17 +37,17 @@ defmodule App.Auth do
   end
 
   @impl true
-  def handle_call({:sign_in, attr}, _from, state) do
+  def handle_call([:sign_in, attr = %{username: _, password: _}], _from, state) do
     {:reply, sign_in(attr), state}
   end
 
   @impl true
-  def handle_call({:sign_out, attr}, _from, state) do
-    {:reply, sign_out(attr), state}
+  def handle_call([:sign_out, sid], _from, state) do
+    {:reply, sign_out(sid), state}
   end
 
   @impl true
-  def handle_call({:sign_up, attr}, _from, state) do
+  def handle_call([:sign_up, attr], _from, state) do
     {:reply, sign_up(attr), state}
   end
 end

@@ -22,7 +22,8 @@ defmodule Server.MixProject do
     [
       {:plug_cowboy, "~> 2.5"},
       {:jason, "~> 1.3"},
-      {:ecto_sqlite3, "~> 0.16"}
+      {:ecto_sqlite3, "~> 0.16"},
+      {:httpoison, "~> 2.2"}
     ]
   end
 end

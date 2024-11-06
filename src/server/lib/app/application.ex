@@ -11,6 +11,7 @@ defmodule App.Application do
       App.DB,
       App.User,
       App.Auth,
+      App.Process,
       AppWeb.Endpoint,
     ]
 
