@@ -42,10 +42,14 @@ class _homePageState extends State<HomePage> {
                         LeaderboardCard(),
                         Spacer(),
                         FilledButton(
-                            onPressed: onPressedSinglePlayer,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/guess');
+                            },
                             child: Text("Single-Player")),
                         FilledButton(
-                            onPressed: onPressedMultiPlayer,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/guess');
+                            },
                             child: Text("Multi-Player")),
                         Spacer(),
                         Row(
@@ -85,14 +89,8 @@ class _homePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   ))
                             ]),
-                                SizedBox(height: 16)
+                        SizedBox(height: 16)
                       ]))
                     ]))));
   }
-
-  // TODO:
-  void onPressedSinglePlayer() {}
-
-  // TODO:
-  void onPressedMultiPlayer() {}
 }
