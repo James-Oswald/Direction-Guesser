@@ -1,6 +1,6 @@
-import 'dart:math';
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:direction_guesser/widgets/missing_device_card.dart';
@@ -68,6 +68,7 @@ class _GuessPageState extends State<GuessPage> {
       "Rio de Janeiro, Brazil",
       "Istanbul, Turkey"
     ];
+    String city = LIES[Random().nextInt(LIES.length)];
 
     return Scaffold(
         body: ValueListenableBuilder<PermissionsState>(
@@ -161,7 +162,8 @@ class _GuessPageState extends State<GuessPage> {
                                     : Theme.of(context)
                                         .colorScheme
                                         .surfaceTint)),
-                                    Text(LIES[Random().nextInt(LIES.length)], // TODO: this should come from the backend
+                        Text(city,
+                            // TODO: this should come from the backend
                             style: TextStyle(
                                 fontStyle: Theme.of(context)
                                     .textTheme
@@ -210,32 +212,14 @@ class _GuessPageState extends State<GuessPage> {
                                 ]))),
                         SizedBox(height: 16),
                         FilledButton(
-                            onPressed: () => submitGuess(context),
-                            child: Text("Get Position")),
-                        SizedBox(height: 16),
-                        Text(
-                            "Current position: $latitude : $longitude\nCurrent heading: $heading",
-                            style: TextStyle(
-                                fontStyle: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.fontStyle,
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.fontSize,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Theme.of(context).colorScheme.surface
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceTint)),
+                            onPressed: () => submitGuess(context, city),
+                            child: Text("Submit Guess")),
                         Spacer()
                       ]))));
             }));
   }
 
-  Future<void> submitGuess(BuildContext context) async {
+  Future<void> submitGuess(BuildContext context, String city) async {
     var location = await Geolocator.getCurrentPosition();
     var direction = await FlutterCompass.events?.first;
     setState(() {
@@ -243,6 +227,11 @@ class _GuessPageState extends State<GuessPage> {
       longitude = location.longitude;
       heading = (direction?.heading)!;
     });
+
+    // TODO: for now doing this here since not compiling backend and the GameServices causes an error
+    // but it should go in the if (guessSentSuccessfully) {}
+    // navigate to the score page
+    Navigator.pushNamed(context, '/score', arguments: city);
 
     final prefs = await SharedPreferences.getInstance();
     final sessionId = prefs.getString('session_id');
