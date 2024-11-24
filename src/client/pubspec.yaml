@@ -13,6 +13,7 @@ dependencies:
   flutter_compass: ^0.8.0
   flutter_launcher_icons:
   geolocator: ^13.0.1
+  holding_gesture: ^1.2.0
   http: ^1.2.2
   intl: ^0.19.0
   provider: ^6.1.2
