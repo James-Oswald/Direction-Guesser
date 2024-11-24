@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:ffi';
-import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:holding_gesture/holding_gesture.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,18 +30,38 @@ enum PermissionsState {
   bothDenied
 }
 
-class _GuessPageState extends State<GuessPage> {
+class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   // set up a notifier for the permissions state
   ValueNotifier<PermissionsState> permissionState =
       ValueNotifier(PermissionsState.okay);
   late AppLifecycleListener lifecycleListener;
   late CameraController controller;
+  late AnimationController animationController;
   double latitude = 0.0;
   double longitude = 0.0;
-  double heading = 0.0;
+  List<double> headings = [];
+  bool collectingHeadings = false;
 
   @override
   void initState() {
+    // create an animation controller for the progress circle on making a guess
+    // animationController = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(seconds: 3),
+    // )..addListener(() {
+    //     setState(() {});
+    //   });
+
+    animationController = AnimationController(
+      /// [AnimationController]s can be created with `vsync: this` because of
+      /// [TickerProviderStateMixin].
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..addListener(() {
+        setState(() {});
+      });
+    animationController.repeat(reverse: true);
+
     super.initState();
     // create a listener for lifecycle state changes
     // we only need to check onRestart (rather than onShow and onResume) because
@@ -54,21 +74,7 @@ class _GuessPageState extends State<GuessPage> {
 
   @override
   Widget build(BuildContext context) {
-    var LIES = [
-      "Foshan, People's Republic of China",
-      "Paris, France",
-      "Karachi, Pakistan",
-      "Yangon, Myanmar",
-      "Ho Chi Minh City, Vietnam",
-      "Singapore, Singapore",
-      "Sydney, Australia",
-      "São Paulo, Brazil",
-      "Hyderabad, India",
-      "Dar es Salaam, Tanzania",
-      "Rio de Janeiro, Brazil",
-      "Istanbul, Turkey"
-    ];
-    String city = LIES[Random().nextInt(LIES.length)];
+    String city = "Istanbul, Turkey";
 
     return Scaffold(
         body: ValueListenableBuilder<PermissionsState>(
@@ -189,48 +195,144 @@ class _GuessPageState extends State<GuessPage> {
                                         .colorScheme
                                         .surfaceTint)),
                         SizedBox(height: 16),
-                        Center(
-                            child: Container(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.black.withOpacity(0.5),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 8))
-                                    ]),
-                                child: Stack(children: [
-                                  ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: CameraPreview(controller)),
-                                  Positioned.fill(
-                                      child: Center(
-                                          child: VerticalDivider(
-                                              color: Colors.red,
-                                              thickness: 2))),
-                                ]))),
                         SizedBox(height: 16),
-                        FilledButton(
-                            onPressed: () => submitGuess(context, city),
-                            child: Text("Submit Guess")),
+                        HoldTimeoutDetector(
+                            onTimeout: () {
+                              collectingHeadings = false;
+                              submitGuess(context, city);
+                            },
+                            onTimerInitiated: () {
+                              animationController.value = 0;
+                              animationController.forward();
+                              collectingHeadings = true;
+                              collectHeadings(context);
+                            },
+                            onCancel: () {
+                              collectingHeadings = false;
+                              animationController.value = 0;
+                            },
+                            holdTimeout: Duration(milliseconds: 3000),
+                            child: collectingHeadings
+                                ? Center(
+                                    child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.9,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 8))
+                                            ]),
+                                        child: Stack(children: [
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: CameraPreview(controller)),
+                                          Positioned.fill(
+                                              child: Center(
+                                                  child: VerticalDivider(
+                                                      color: Colors.red,
+                                                      thickness: 2))),
+                                          Positioned.fill(
+                                              child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: SizedBox(
+                                                      height: 100,
+                                                      width: 100,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        value:
+                                                            animationController
+                                                                .value,
+                                                        // backgroundColor:
+                                                        //     Theme.of(context)
+                                                        //         .colorScheme
+                                                        //         .onPrimary,
+                                                        valueColor:
+                                                            AlwaysStoppedAnimation(
+                                                                Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .primary),
+                                                        strokeWidth: 8.0,
+                                                      ))))
+                                        ])))
+                                : Center(
+                                    child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.9,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 8))
+                                            ]),
+                                        child: Stack(children: [
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: CameraPreview(controller)),
+                                          Positioned.fill(
+                                              child: Center(
+                                                  child: VerticalDivider(
+                                                      color: Colors.red,
+                                                      thickness: 2))),
+                                        ])))),
+                        SizedBox(height: 16),
+                        Text("Press and hold to submit your guess!",
+                            style: TextStyle(
+                                fontStyle: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.fontStyle,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.fontSize,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .surfaceTint)),
                         Spacer()
                       ]))));
             }));
   }
 
-  Future<void> submitGuess(BuildContext context, String city) async {
-    var location = await Geolocator.getCurrentPosition();
-    var direction = await FlutterCompass.events?.first;
-    setState(() {
-      latitude = location.latitude;
-      longitude = location.longitude;
-      heading = (direction?.heading)!;
-    });
+  Future<void> collectHeadings(BuildContext context) async {
+    // clear any headings from a previous unfinished guess
+    headings.clear();
 
+    // get the latitude and longitude
+    var location = await Geolocator.getCurrentPosition();
+
+    // while the user is holding down, continuously collect headings
+    while (collectingHeadings) {
+      var direction = await FlutterCompass.events?.first;
+      setState(() {
+        latitude = location.latitude;
+        longitude = location.longitude;
+        headings.add((direction?.heading)!);
+      });
+    }
+  }
+
+  Future<void> submitGuess(BuildContext context, String city) async {
     // TODO: for now doing this here since not compiling backend and the GameServices causes an error
     // but it should go in the if (guessSentSuccessfully) {}
     // navigate to the score page
+
     Navigator.pushNamed(context, '/score', arguments: city);
 
     final prefs = await SharedPreferences.getInstance();
@@ -240,7 +342,7 @@ class _GuessPageState extends State<GuessPage> {
         sessionId as UnsignedInt,
         latitude,
         longitude,
-        heading);
+        headings);
 
     // Check the result of sending the guess
     if (guessSentSuccessfully) {
