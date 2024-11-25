@@ -41,17 +41,10 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   double longitude = 0.0;
   List<double> headings = [];
   bool collectingHeadings = false;
+  bool tryAgain = false;
 
   @override
   void initState() {
-    // create an animation controller for the progress circle on making a guess
-    // animationController = AnimationController(
-    //   vsync: this,
-    //   duration: const Duration(seconds: 3),
-    // )..addListener(() {
-    //     setState(() {});
-    //   });
-
     animationController = AnimationController(
       /// [AnimationController]s can be created with `vsync: this` because of
       /// [TickerProviderStateMixin].
@@ -199,12 +192,17 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                         HoldTimeoutDetector(
                             onTimeout: () {
                               collectingHeadings = false;
-                              submitGuess(context, city);
+                              if (tryAgain) {
+                                tryAgain = false;
+                              } else {
+                                submitGuess(context, city);
+                              }
                             },
                             onTimerInitiated: () {
                               animationController.value = 0;
                               animationController.forward();
                               collectingHeadings = true;
+                              tryAgain = false;
                               collectHeadings(context);
                             },
                             onCancel: () {
@@ -249,10 +247,6 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                                                         value:
                                                             animationController
                                                                 .value,
-                                                        // backgroundColor:
-                                                        //     Theme.of(context)
-                                                        //         .colorScheme
-                                                        //         .onPrimary,
                                                         valueColor:
                                                             AlwaysStoppedAnimation(
                                                                 Theme.of(
@@ -325,6 +319,25 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
         longitude = location.longitude;
         headings.add((direction?.heading)!);
       });
+      if (headings.any((it) {
+        return (it - direction!.heading!).abs() > 15;
+      })) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Center(
+                child: Text('Hold still!',
+                    style: TextStyle(
+                        fontStyle:
+                            Theme.of(context).textTheme.titleMedium?.fontStyle,
+                        fontSize:
+                            Theme.of(context).textTheme.titleMedium?.fontSize,
+                        color: Theme.of(context).colorScheme.onPrimary))),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+        collectingHeadings = false;
+        tryAgain = true;
+      }
     }
   }
 
