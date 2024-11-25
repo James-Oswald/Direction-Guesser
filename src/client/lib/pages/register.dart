@@ -1,4 +1,4 @@
-import 'package:direction_guesser/controllers/usersServices.dart';
+import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/widgets/dropdown.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
@@ -221,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     FilledButton(
                         onPressed: () {
                           Navigator.pop(context);
-                        }, // TODO: REST API signup call
+                        },
                         style: FilledButton.styleFrom(
                           backgroundColor: Theme.of(context)
                               .colorScheme
@@ -245,39 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         )),
                     SizedBox(width: 24),
                     FilledButton(
-                        onPressed: () async {
-                          // Use async/await for better readability and error handling
-                          bool isRegistered = await context
-                              .read<usersServices>()
-                              .registerUser(usernameController.text,
-                                  emailController.text, passwordController.text
-                                  //TODO: Add age, gender
-                                  );
-
-                          // Check the result of registration
-                          if (isRegistered) {
-                            // Show success message and navigate back to login
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Registration successful! Please log in.'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                            // Navigate back to login page
-                            Navigator.pop(context);
-                          } else {
-                            // Show failure message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Registration failed. Please try again.'),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.error,
-                              ),
-                            );
-                          }
-                        }, // TODO: REST API signup call
+                        onPressed: () => submit(context),
                         style: FilledButton.styleFrom(
                           backgroundColor:
                               Theme.of(context).colorScheme.primaryContainer,
@@ -307,5 +275,39 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
     }));
+  }
+
+  Future<void> submit(BuildContext context) async {
+    // Use async/await for better readability and error handling
+    bool isRegistered = await context.read<UsersServices>().registerUser(
+        usernameController.text, emailController.text, passwordController.text
+        // TODO: REST API signup call
+        // TODO: Add age, gender
+        );
+
+    // Check the result of registration
+    if (isRegistered) {
+      if (context.mounted) {
+        // Show success message and navigate back to login
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration successful! Please log in.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate back to login page
+        Navigator.pop(context);
+      }
+    } else {
+      // Show failure message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration failed. Please try again.'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }

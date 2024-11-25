@@ -6,10 +6,10 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _homePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _homePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,7 +57,8 @@ class _homePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               FilledButton.tonal(
-                                  onPressed: () => {}, // TODO: implement
+                                  onPressed: () => {},
+                                  // TODO: implement settings
                                   child: Icon(
                                     Icons.settings_rounded,
                                     color: Theme.of(context)
@@ -65,7 +66,8 @@ class _homePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => {}, // TODO: implement
+                                  onPressed: () => {},
+                                  // TODO: implement store
                                   child: Icon(
                                     Icons.store_rounded,
                                     color: Theme.of(context)
@@ -73,7 +75,8 @@ class _homePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => {}, // TODO: implement
+                                  onPressed: () => {},
+                                  // TODO: implement achievements
                                   child: Icon(
                                     Icons.star_rounded,
                                     color: Theme.of(context)
@@ -81,7 +84,8 @@ class _homePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => {}, // TODO: implement
+                                  onPressed: () => {},
+                                  // TODO: implement profile
                                   child: Icon(
                                     Icons.person_rounded,
                                     color: Theme.of(context)

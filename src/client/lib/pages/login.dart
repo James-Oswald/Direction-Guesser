@@ -1,4 +1,4 @@
-import 'package:direction_guesser/controllers/usersServices.dart';
+import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerLeft,
                   child: Row(children: [
                     SizedBox(width: 64),
-                    // TODO: this needs functionality
+                    // TODO: forgot password needs functionality
                     Text(
                       "Forgot password?",
                       textAlign: TextAlign.left,
@@ -92,43 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   ]),
                 ),
                 FilledButton(
-                    onPressed: () async {
-
-                      // TODO: this is a quick fix for demo 2 to move directly to homepage
-                      Navigator.pushNamed(context, '/home');
-
-                      // Use async/await for better readability and error handling
-                      bool isLoggedIn = await context
-                          .read<usersServices>()
-                          .loginUser(
-                              usernameController.text,
-                              passwordController
-                                  .text // assuming genderController is a TextEditingController
-                              );
-
-                      // Check the result of registration
-                      if (isLoggedIn) {
-                        // Show success message and navigate back to login
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Login successful!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-
-                        // Navigate back to login page
-                        Navigator.pushNamed(context, '/home');
-                      } else {
-                        // Show failure message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Login failed. Please try again.'),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.error,
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () => submit(context),
                     style: FilledButton.styleFrom(
                       backgroundColor:
                           Theme.of(context).colorScheme.primaryContainer,
@@ -200,5 +164,43 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }));
+  }
+
+  Future<void> submit(BuildContext context) async {
+    // TODO: this is a quick fix for demos
+    // remove once backend is integrated
+    Navigator.pushNamed(context, '/home');
+
+    // Use async/await for better readability and error handling
+    bool isLoggedIn = await context.read<UsersServices>().loginUser(
+        usernameController.text,
+        passwordController
+            .text // assuming genderController is a TextEditingController
+        );
+
+    // Check the result of registration
+    if (isLoggedIn) {
+      // Show success message and navigate back to home
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate back to login page
+        Navigator.pushNamed(context, '/home');
+      }
+    } else {
+      // Show failure message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. Please try again.'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }

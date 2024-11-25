@@ -15,6 +15,7 @@ class LeaderboardCard extends StatelessWidget {
                 padding: EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  // TODO: this should all be queried from the backend
                   children: const [
                     LeaderboardEntryPill(
                         profilePicture: NetworkImage(
