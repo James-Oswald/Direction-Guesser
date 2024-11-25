@@ -9,7 +9,6 @@ final NumberFormat formatter = NumberFormat.decimalPatternDigits(
 );
 
 class LeaderboardEntryPill extends StatelessWidget {
-
   const LeaderboardEntryPill(
       {required this.username,
       required this.profilePicture,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PermissionsDeniedCard extends StatelessWidget {
-  const PermissionsDeniedCard({required this.mainText, required this.subText, required this.onPressed})
+  const PermissionsDeniedCard(
+      {required this.mainText, required this.subText, required this.onPressed})
       : super();
 
   final String mainText;
@@ -60,7 +61,8 @@ class PermissionsDeniedCard extends StatelessWidget {
                             textAlign: TextAlign.center,
                           )),
                       SizedBox(height: 16),
-                      FilledButton(onPressed: onPressed, child: Text("Go to Settings")),
+                      FilledButton(
+                          onPressed: onPressed, child: Text("Go to Settings")),
                       SizedBox(height: 16),
                     ])))));
   }
