@@ -1,5 +1,6 @@
 import 'package:direction_guesser/pages/guess.dart';
 import 'package:direction_guesser/pages/home.dart';
+import 'package:direction_guesser/pages/profile.dart';
 import 'package:direction_guesser/pages/score.dart';
 import 'package:flutter/material.dart';
 import 'pages/login.dart';
@@ -17,6 +18,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => GuessPage());
     case '/score':
       return MaterialPageRoute(builder: (context) => ScorePage(city: settings.arguments.toString()));
+    case '/profile':
+      return MaterialPageRoute(builder: (context) => ProfilePage());
     default:
       return MaterialPageRoute(
           builder: (context) =>

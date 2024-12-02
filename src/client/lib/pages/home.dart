@@ -84,8 +84,7 @@ class _HomePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => {},
-                                  // TODO: implement profile
+                                  onPressed: () => { Navigator.pushNamed(context, '/profile') },
                                   child: Icon(
                                     Icons.person_rounded,
                                     color: Theme.of(context)
