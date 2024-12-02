@@ -1,7 +1,7 @@
 defmodule App.Process do
   require Logger
  # ---
-  import :math, only: [sin: 1, cos: 1, atan2: 2, sqrt: 1, pow: 2, pi: 0]
+  import :math, only: [sin: 1, cos: 1, atan2: 2, pi: 0]
 
   defp calculate_bearing(lat1, lon1, lat2, lon2) do
     lat1_rad = deg_to_rad(lat1)
@@ -66,7 +66,6 @@ defmodule App.Process do
     |> case do
          [_, lat, lon] ->
            {String.to_float(lat), String.to_float(lon)}  # Convert the matched strings to floats
-         _ ->
        end
   end
  # ---

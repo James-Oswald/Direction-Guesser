@@ -1,7 +1,7 @@
 defmodule App.User do
   require Logger
 
-  @private [:password, :__struct__, :__meta__]
+  # @private [:password, :__struct__, :__meta__]
  # ---
   use GenServer
 
