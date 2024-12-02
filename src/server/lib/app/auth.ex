@@ -5,14 +5,14 @@ defmodule App.Auth do
 
   require Logger
  # ---
-  defp sign_in(opts = %{username: username, password: password}) do
+  defp sign_in(opts = %{username: _, password: _}) do
     Logger.debug("(auth): signing in #{inspect(opts)}")
     User.Schema
     |> DB.get_by!(opts)
     |> Users.start_user
   end
 
-  defp sign_out(opts = %{username: username, password: password}) do
+  defp sign_out(opts = %{username: _, password: _}) do
     Logger.debug("(auth): signing out #{inspect(opts)}")
     User.Schema
     |> DB.get_by!(opts)
