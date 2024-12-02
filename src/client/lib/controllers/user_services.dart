@@ -1,17 +1,18 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class usersServices{
+class UsersServices{
 
   Future<bool> loginUser(String username, String password) async {
 
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username/login');
+    final url = Uri.parse('http://10.0.2.2:8080/api/auth');
 
     final body = jsonEncode({
-      'username': username,
-      'password': password,
+      'sign_in': {
+        'username': username,
+        'password': password
+      }
     });
 
     // Send POST request to /login
@@ -21,12 +22,9 @@ class usersServices{
       body: body,
     );
 
-    print(response.statusCode);
-    print(response.body);
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final sessionId = data['session_id'];
+      final sessionId = response.body;
 
       // Store the session ID in shared preferences
       final prefs = await SharedPreferences.getInstance();
@@ -48,7 +46,7 @@ class usersServices{
       return false;
     }
 
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username/logout');
+    final url = Uri.parse('http://10.0.2.2:8080/api/auth/');
 
     // Send POST request to /logout with session ID in headers
     final response = await http.post(
@@ -99,13 +97,15 @@ class usersServices{
   }
 
   Future<bool> registerUser(String username, String email, String password) async {
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username');
+    final url = Uri.parse('http://10.0.2.2:8080/api/auth/');
 
     // Create JSON body for the request
     final body = jsonEncode({
-      'username': username,
-      'email': email,
-      'password': password
+      'sign_up': {
+        'username': username,
+        'email': email,
+        'password': password
+      }
     });
 
     print(body);

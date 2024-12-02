@@ -25,7 +25,7 @@ class GameServices {
   }
 
   Future<bool> sendGuess(UnsignedInt sessionId, double latitude,
-      double longitude, double heading) async {
+      double longitude, List<double> headings) async {
     // TODO: we haven't decided on an endpoint for this yet
     final url = Uri.parse('http://10.0.2.2:8080/game/guess');
 
@@ -34,7 +34,7 @@ class GameServices {
       'session_id': sessionId,
       'latitude': latitude,
       'longitude': longitude,
-      'heading': heading
+      'headings': headings
     });
 
     // Send POST request to /game/guess TODO: update endpoint

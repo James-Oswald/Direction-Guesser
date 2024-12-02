@@ -1,18 +1,22 @@
 import 'package:camera/camera.dart';
+import 'package:direction_guesser/controllers/game_services.dart';
+import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/theme.dart';
-import 'package:direction_guesser/controllers/usersServices.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'routes.dart';
 
 List<CameraDescription> cameras = [];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // poll available cameras on startup to prepare for guess screen
   cameras = await availableCameras();
-  runApp(MultiProvider(
-      providers: [Provider(create: (_) => usersServices())], child: MainApp()));
+  runApp(MultiProvider(providers: [
+    Provider<UsersServices>(create: (context) => UsersServices()),
+    Provider<GameServices>(create: (context) => GameServices())
+  ], child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
