@@ -45,7 +45,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
 
   // TODO: this should be queried from the back end
   // and NOT queried on every rebuild, only once
-  String city = "Istanbul, Turkey";
+  String city = "Bethlehem Central Middle School";
 
   @override
   void initState() {
@@ -323,15 +323,15 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     Navigator.pushNamed(context, '/score', arguments: city);
 
     final prefs = await SharedPreferences.getInstance();
-    final sessionId = prefs.getString('session_id');
     bool guessSentSuccessfully = false;
     if (context.mounted) {
       guessSentSuccessfully = await context.read<GameServices>().sendGuess(
-          // TODO: this cast should go away when we refactor to uints for session_id
-          sessionId as UnsignedInt,
+          headings,
           latitude,
           longitude,
-          headings);
+          42.6204,
+          -73.8257
+          );
     }
 
     // Check the result of sending the guess

@@ -28,7 +28,7 @@ class UsersServices{
 
       // Store the session ID in shared preferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('sessionId', sessionId);
+      await prefs.setString('x-auth-token', sessionId);
 
       return true;
     } else {
@@ -38,9 +38,9 @@ class UsersServices{
 
   Future<bool> logoutUser(String username) async {
     final prefs = await SharedPreferences.getInstance();
-    final sessionId = prefs.getString('session_id');
+    final sessionId = prefs.getString('x-auth-token');
 
-    await prefs.remove('session_id');
+    await prefs.remove('x-auth-token');
     if (sessionId == null) {
       //No session ID found, user is already logged out
       return false;
@@ -53,13 +53,13 @@ class UsersServices{
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $sessionId',
+        'x-auth-token': '$sessionId',
       },
     );
 
     if (response.statusCode == 200) {
       // Remove session ID from shared preferences
-      await prefs.remove('session_id');
+      await prefs.remove('x-auth-token');
       return true;
     } else {
       return false;
@@ -68,21 +68,21 @@ class UsersServices{
 
   Future<bool> getUserData(String username) async {
     final prefs = await SharedPreferences.getInstance();
-    final sessionId = prefs.getString('session_id');
+    final sessionId = prefs.getString('x-auth-token');
 
     if (sessionId == null) {
     //No session ID found, user needs to login
       return false;
     }
 
-    final url = Uri.parse('http://10.0.2.2:8080/users/$username');
+    final url = Uri.parse('http://10.0.2.2:8080/user');
 
     // Send GET request with session ID in headers
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $sessionId',
+        'x-auth-token': '$sessionId',
       },
     );
 
