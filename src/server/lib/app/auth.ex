@@ -1,31 +1,32 @@
 defmodule App.Auth do
   alias App.DB
   alias App.User
-  alias App.User.Schema
+  alias App.Supervisor.Users
 
-  defp sign_in(attr = %{username: _, password: _}) do
-    Schema
-    |> DB.get_by!(attr)
-    |> User.start_child
-  end
-
-  defp sign_out(uid) when is_number(uid) do
-    Schema
-    |> DB.get_by!(%{id: uid})
-    |> User.terminate_child
-  end
-
-  defp sign_up(attr) when is_list(attr) do
-    sign_up(Enum.into(attr, %{}))
-  end
-  defp sign_up(attr) when is_map(attr) do
-    %Schema{}
-    |> Schema.changeset(attr)
-    |> DB.insert()
-  end
-
-  use GenServer
   require Logger
+ # ---
+  defp sign_in(opts = %{username: username, password: password}) do
+    Logger.debug("(auth): signing in #{inspect(opts)}")
+    User.Schema
+    |> DB.get_by!(opts)
+    |> Users.start_user
+  end
+
+  defp sign_out(opts = %{username: username, password: password}) do
+    Logger.debug("(auth): signing out #{inspect(opts)}")
+    User.Schema
+    |> DB.get_by!(opts)
+    |> Users.stop_user
+  end
+
+  defp sign_up(opts) do
+    Logger.debug("(auth): signing up #{inspect(opts)}")
+    open_user(opts) |> DB.insert!()
+  end
+
+  defp open_user(opts), do: %User.Schema{} |> User.Schema.changeset(opts)
+ # ---
+  use GenServer
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -33,21 +34,23 @@ defmodule App.Auth do
 
   @impl true
   def init(state) do
+    Logger.info("(auth): started #{inspect(state)}")
     {:ok, state}
   end
 
   @impl true
-  def handle_call([:sign_in, attr = %{username: _, password: _}], _from, state) do
-    {:reply, sign_in(attr), state}
+  def handle_call({:sign_in, opts}, _from, state) do
+    {:reply, sign_in(opts), state}
   end
 
   @impl true
-  def handle_call([:sign_out, sid], _from, state) do
-    {:reply, sign_out(sid), state}
+  def handle_call({:sign_out, opts}, _from, state) do
+    {:reply, sign_out(opts), state}
   end
 
   @impl true
-  def handle_call([:sign_up, attr], _from, state) do
-    {:reply, sign_up(attr), state}
+  def handle_call({:sign_up, opts}, _from, state) do
+    {:reply, sign_up(opts), state}
   end
+ # ---
 end
