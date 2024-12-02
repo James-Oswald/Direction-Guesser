@@ -34,3 +34,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logo.png
+    - assets/default_profile_picture.png
