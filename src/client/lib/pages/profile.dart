@@ -11,8 +11,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   // TODO: set these to empty once backend is hooked up
-  String username = "default_user";
-  String email = "defaultemail@email.com";
+  String username = "default-user";
+  String email = "myemail@email.com";
   AssetImage profilePicture = AssetImage("assets/default_profile_picture.png");
   bool success = false;
 
@@ -37,8 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             child: Scaffold(
               backgroundColor: Colors.transparent,
-              body: Center(
-                child: Column(
+              body: Row(children: [SizedBox(width:64), Column(
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -76,15 +75,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ?.fontSize,
                             color: Theme.of(context).colorScheme.primary),
                         textAlign: TextAlign.center),
-                    SizedBox(height: 64),
+                    Spacer(),
                     FilledButton.tonal(
                         onPressed: () {
                           Navigator.pushNamed(context, '/home');
                         },
-                        child: Text("back")),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                        )),
+                    SizedBox(height: 32)
                   ],
                 ),
-              ),
+              ]),
             ));
       }));
     } else {
@@ -118,12 +123,18 @@ class _ProfilePageState extends State<ProfilePage> {
                               Theme.of(context).textTheme.titleLarge?.fontSize,
                           color: Theme.of(context).colorScheme.error),
                       textAlign: TextAlign.center),
-                  SizedBox(height: 64),
+                  Spacer(),
                   FilledButton.tonal(
                       onPressed: () {
                         Navigator.pushNamed(context, '/home');
                       },
-                      child: Text("back"))
+                      child:  Icon(
+                        Icons.arrow_back_rounded,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSecondaryContainer,
+                      )),
+                  SizedBox(height:32)
                 ],
               ),
             ),
@@ -134,7 +145,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> getUserData(BuildContext context) async {
-    // TODO: remove this, is for testing only
+    // TODO: remove this once backend is hooked up, is for testing only
     success = true;
 
     success = await context.read<UsersServices>().getUserData(username);

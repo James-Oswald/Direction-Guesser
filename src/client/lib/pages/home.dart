@@ -57,8 +57,10 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               FilledButton.tonal(
-                                  onPressed: () => {},
-                                  // TODO: implement settings
+                                  onPressed: () => {
+                                        Navigator.pushNamed(
+                                            context, '/settings')
+                                      },
                                   child: Icon(
                                     Icons.settings_rounded,
                                     color: Theme.of(context)
@@ -84,7 +86,9 @@ class _HomePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => { Navigator.pushNamed(context, '/profile') },
+                                  onPressed: () => {
+                                        Navigator.pushNamed(context, '/profile')
+                                      },
                                   child: Icon(
                                     Icons.person_rounded,
                                     color: Theme.of(context)
