@@ -174,8 +174,7 @@ class _LoginPageState extends State<LoginPage> {
     // Use async/await for better readability and error handling
     bool isLoggedIn = await context.read<UsersServices>().loginUser(
         usernameController.text,
-        passwordController
-            .text // assuming genderController is a TextEditingController
+        passwordController.text // assuming genderController is a TextEditingController
         );
 
     // Check the result of registration
