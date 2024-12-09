@@ -10,10 +10,27 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool darkMode = SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  bool darkMode =
+      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark;
 
   @override
   Widget build(BuildContext context) {
+    if (themeNotifier.value == ThemeMode.dark) {
+      darkMode = true;
+    }
+    else if (themeNotifier.value == ThemeMode.light) {
+      darkMode = false;
+    }
+    TextStyle mediumStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleMedium?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+    TextStyle largeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleMedium?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
     return Scaffold(body: Builder(builder: (context) {
       return Container(
           decoration: BoxDecoration(
@@ -46,43 +63,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             backgroundColor: Colors.transparent)),
                     SizedBox(height: 16),
                     Text("Direction Guesser",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontStyle,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontSize,
-                            color: Theme.of(context).colorScheme.primary),
-                        textAlign: TextAlign.center),
+                        style: largeStyle, textAlign: TextAlign.center),
                     SizedBox(height: 16),
                     Text(
                         "Developers: \n\t\tArmin Karic\n\t\tIshtyaq Khan\n\t\tSharie Rhea\n\t\tRune Vannaken",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.fontStyle,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.fontSize,
-                            color: Theme.of(context).colorScheme.primary),
+                        style: mediumStyle,
                         textAlign: TextAlign.left),
                     Text("Sponsor: \n\t\tJames Oswald",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.fontStyle,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.fontSize,
-                            color: Theme.of(context).colorScheme.primary),
-                        textAlign: TextAlign.left),
+                        style: mediumStyle, textAlign: TextAlign.left),
                     Spacer(),
                     Row(children: [
                       Switch(
@@ -90,21 +78,12 @@ class _SettingsPageState extends State<SettingsPage> {
                           onChanged: (bool value) {
                             setState(() {
                               darkMode = value;
-                              themeNotifier.value = darkMode ? ThemeMode.dark : ThemeMode.light;
+                              themeNotifier.value =
+                                  darkMode ? ThemeMode.dark : ThemeMode.light;
                             });
                           }),
                       SizedBox(width: 8),
-                      Text("Dark Mode",
-                          style: TextStyle(
-                              fontStyle: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.fontStyle,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.fontSize,
-                              color: Theme.of(context).colorScheme.primary))
+                      Text("Dark Mode", style: mediumStyle)
                     ]),
                     Spacer(),
                     Row(children: [
@@ -116,17 +95,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             });
                           }),
                       SizedBox(width: 8),
-                      Text("Sound Effects",
-                          style: TextStyle(
-                              fontStyle: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.fontStyle,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.fontSize,
-                              color: Theme.of(context).colorScheme.primary))
+                      Text(
+                        "Sound Effects",
+                        style: mediumStyle,
+                      )
                     ]),
                     Spacer(),
                     FilledButton.tonal(

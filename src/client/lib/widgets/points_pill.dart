@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-enum Rank { first, second, third, other }
-
 final NumberFormat formatter = NumberFormat.decimalPatternDigits(
   locale: 'en_us',
   decimalDigits: 0,
 );
 
-class CurrencyPill extends StatelessWidget {
-  const CurrencyPill({required this.funds}) : super();
+class PointsPill extends StatelessWidget {
+  const PointsPill({required this.points}) : super();
 
-  final int funds;
+  final int points;
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +23,12 @@ class CurrencyPill extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.attach_money_rounded,
+                  Icons.stars_rounded,
                   color: Theme.of(context).colorScheme.onTertiaryContainer,
                 ),
                 SizedBox(width: 4),
                 Text(
-                  formatter.format(funds),
+                  formatter.format(points),
                   style: TextStyle(
                       fontStyle:
                           Theme.of(context).textTheme.labelLarge?.fontStyle,

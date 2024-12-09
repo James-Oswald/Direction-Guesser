@@ -37,13 +37,16 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             child: Scaffold(
               backgroundColor: Colors.transparent,
-              body: Row(children: [SizedBox(width:64), Column(
+              body: Row(children: [
+                SizedBox(width: 64),
+                Column(
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 128),
                     SizedBox(
-                        height: 128, width: 128,
+                        height: 128,
+                        width: 128,
                         child: CircleAvatar(
                             foregroundImage: profilePicture,
                             backgroundColor: Theme.of(context)
@@ -128,13 +131,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {
                         Navigator.pushNamed(context, '/home');
                       },
-                      child:  Icon(
+                      child: Icon(
                         Icons.arrow_back_rounded,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondaryContainer,
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
                       )),
-                  SizedBox(height:32)
+                  SizedBox(height: 32)
                 ],
               ),
             ),

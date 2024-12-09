@@ -16,6 +16,22 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle labelLargeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.labelLarge?.fontSize);
+
+    TextStyle labelSmallStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.labelSmall?.fontStyle,
+        fontSize: Theme.of(context).textTheme.labelSmall?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
+    TextStyle headlineSmallStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.headlineSmall?.fontStyle,
+        fontSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceTint);
+
     return Scaffold(body: Builder(builder: (context) {
       return Container(
         decoration: BoxDecoration(
@@ -79,15 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       "Forgot password?",
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                          fontStyle:
-                              Theme.of(context).textTheme.labelSmall?.fontStyle,
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall?.fontSize,
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Theme.of(context).colorScheme.surface
-                                  : Theme.of(context).colorScheme.surfaceTint),
+                      style: labelSmallStyle,
                     )
                   ]),
                 ),
@@ -116,19 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       "New?",
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                          fontStyle: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.fontStyle,
-                          fontSize: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.fontSize,
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Theme.of(context).colorScheme.surface
-                                  : Theme.of(context).colorScheme.surfaceTint),
+                      style: headlineSmallStyle,
                     ),
                     SizedBox(width: 24),
                     FilledButton(
@@ -143,15 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Text(
                           "Sign Up",
-                          style: TextStyle(
-                              fontStyle: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontStyle,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontSize),
+                          style: labelLargeStyle,
                           selectionColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
                         )),

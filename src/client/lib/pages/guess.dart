@@ -93,6 +93,16 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   }
 
   Container guessUI() {
+    TextStyle largeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
+    TextStyle mediumStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
     return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -112,15 +122,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
             body: Center(
                 child: Column(mainAxisSize: MainAxisSize.max, children: [
               Spacer(),
-              Text("Point to...",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleLarge?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text("Point to...", style: largeStyle),
               Text(city,
                   // TODO: this should come from the backend
                   style: TextStyle(
@@ -129,15 +131,11 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                       fontSize: 32,
                       color: Theme.of(context).colorScheme.error)),
               Spacer(),
-              Text("Line up your guess using the camera as a guide.",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "Line up your guess using\nthe camera as a guide.",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 16),
               SizedBox(height: 16),
               HoldTimeoutDetector(
@@ -218,15 +216,11 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                                             color: Colors.red, thickness: 2))),
                               ])))),
               SizedBox(height: 16),
-              Text("Press and hold to submit your guess!",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "Press and hold to submit your guess!",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               Spacer()
             ]))));
   }
@@ -293,7 +287,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
         headings.add((direction?.heading)!);
       });
       if (headings.any((it) {
-            return (it - direction!.heading!).abs() > 15;
+            return (it - direction!.heading!).abs() > 20;
           }) &&
           context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
