@@ -1,4 +1,4 @@
-import 'package:direction_guesser/widgets/currency_pill.dart';
+import 'package:direction_guesser/widgets/points_pill.dart';
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       SizedBox(height: 64),
-                      CurrencyPill(funds: 15827),
+                      PointsPill(points: 15827),
                       SizedBox(height: 32),
                       Expanded(
                           child:

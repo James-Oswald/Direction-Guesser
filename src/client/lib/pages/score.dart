@@ -17,6 +17,11 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle mediumStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
     return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -36,15 +41,11 @@ class _ScorePageState extends State<ScorePage> {
             body: Center(
                 child: Column(mainAxisSize: MainAxisSize.max, children: [
               Spacer(),
-              Text("Your guess for",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleLarge?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "Your guess for",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               Text(widget.city,
                   // TODO: this should come from the backend
                   style: TextStyle(
@@ -53,15 +54,11 @@ class _ScorePageState extends State<ScorePage> {
                       fontSize: 32,
                       color: Theme.of(context).colorScheme.error)),
               SizedBox(height: 16),
-              Text("was",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "was",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 16),
               Text("25.55° off",
                   style: TextStyle(

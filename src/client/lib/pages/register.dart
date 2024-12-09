@@ -21,6 +21,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle bodySmallStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.bodySmall?.fontStyle,
+        fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.outline);
+
+    TextStyle bodyStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.bodySmall?.fontStyle,
+        fontSize: 22,
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceTint);
+
+    TextStyle labelLargeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.labelLarge?.fontSize);
+
     return Scaffold(body: Builder(builder: (context) {
       return Container(
         decoration: BoxDecoration(
@@ -93,14 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Text(
                     "Optional demographic information is collected for research purposes.",
                     textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontStyle:
-                            Theme.of(context).textTheme.bodySmall?.fontStyle,
-                        fontSize:
-                            Theme.of(context).textTheme.bodySmall?.fontSize,
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Theme.of(context).colorScheme.surface
-                            : Theme.of(context).colorScheme.outline),
+                    style: bodySmallStyle,
                   ),
                 ),
                 SizedBox(height: 16),
@@ -111,19 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text("age:",
-                              style: TextStyle(
-                                  fontStyle: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.fontStyle,
-                                  fontSize: 22,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Theme.of(context).colorScheme.surface
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .surfaceTint)),
+                          Text("age:", style: bodyStyle),
                           SizedBox(width: 12),
                           SizedBox(
                             width: 128,
@@ -131,15 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: TextField(
                               controller: ageController,
                               textAlignVertical: TextAlignVertical.center,
-                              style: TextStyle(
-                                  fontStyle: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge
-                                      ?.fontStyle,
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge
-                                      ?.fontSize),
+                              style: labelLargeStyle,
                               decoration: InputDecoration(
                                 hintText: "age",
                                 hintStyle: TextStyle(
@@ -182,19 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text("gender:",
-                              style: TextStyle(
-                                  fontStyle: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge
-                                      ?.fontStyle,
-                                  fontSize: 22,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Theme.of(context).colorScheme.surface
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .surfaceTint)),
+                          Text("gender:", style: bodyStyle),
                           SizedBox(width: 12),
                           SizedBox(
                               height: 64,
@@ -231,15 +210,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         child: Text(
                           "Login",
-                          style: TextStyle(
-                              fontStyle: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontStyle,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontSize),
+                          style: labelLargeStyle,
                           selectionColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
                         )),
@@ -254,15 +225,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         child: Text(
                           "Sign Up",
-                          style: TextStyle(
-                              fontStyle: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontStyle,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.fontSize),
+                          style: labelLargeStyle,
                           selectionColor:
                               Theme.of(context).colorScheme.onPrimaryContainer,
                         )),

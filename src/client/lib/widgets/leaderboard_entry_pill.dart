@@ -26,12 +26,9 @@ class LeaderboardEntryPill extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
             color: switch (rank) {
-              Rank.first => Color.lerp(
-                  Theme.of(context).colorScheme.primary, Colors.black, 0.3),
-              Rank.second => Color.lerp(
-                  Theme.of(context).colorScheme.primary, Colors.black, 0.2),
-              Rank.third => Color.lerp(
-                  Theme.of(context).colorScheme.primary, Colors.black, 0.1),
+              Rank.first => Color(0xFFC49812),
+              Rank.second => Color(0xFF757677),
+              Rank.third => Color(0xFF80683D),
               Rank.other => Theme.of(context).colorScheme.primary,
             },
             borderRadius: BorderRadius.circular(100.0)),
