@@ -18,6 +18,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle titleLargeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
     getUserData(context);
     if (success) {
       return Scaffold(body: Builder(builder: (context) {
@@ -54,30 +59,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 .onSecondaryContainer)),
                     SizedBox(height: 16),
                     Text("username: $username",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontStyle,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontSize,
-                            color: Theme.of(context).colorScheme.primary),
-                        textAlign: TextAlign.center),
+                        style: titleLargeStyle, textAlign: TextAlign.center),
                     SizedBox(height: 16),
                     Text("email: $email",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontStyle,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.fontSize,
-                            color: Theme.of(context).colorScheme.primary),
-                        textAlign: TextAlign.center),
+                        style: titleLargeStyle, textAlign: TextAlign.center),
                     Spacer(),
                     FilledButton.tonal(
                         onPressed: () {
