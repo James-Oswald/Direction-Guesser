@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'routes.dart';
 
 List<CameraDescription> cameras = [];
+bool soundEnabled = true;
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,15 +26,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: MaterialTheme(Theme.of(context).textTheme)
-            .theme(MaterialTheme.lightScheme()),
-        darkTheme: MaterialTheme(Theme.of(context).textTheme)
-            .theme(MaterialTheme.darkScheme()),
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: generateRoute,
-        initialRoute: CheckSessionStatus() ? '/home' : '/login');
+    return ValueListenableBuilder<ThemeMode>(
+        valueListenable: themeNotifier,
+        builder: (_, mode, __) {
+          return MaterialApp(
+              theme: MaterialTheme(Theme.of(context).textTheme)
+                  .theme(MaterialTheme.lightScheme()),
+              darkTheme: MaterialTheme(Theme.of(context).textTheme)
+                  .theme(MaterialTheme.darkScheme()),
+              themeMode: mode,
+              debugShowCheckedModeBanner: false,
+              onGenerateRoute: generateRoute,
+              initialRoute: CheckSessionStatus() ? '/home' : '/login');
+        });
   }
 }
 
