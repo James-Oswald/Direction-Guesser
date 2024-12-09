@@ -1,6 +1,8 @@
-import 'package:direction_guesser/widgets/points_pill.dart';
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
+import 'package:direction_guesser/widgets/points_pill.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/text_entry_pill.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +12,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController roomCodeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,12 +49,38 @@ class _HomePageState extends State<HomePage> {
                             onPressed: () {
                               Navigator.pushNamed(context, '/guess');
                             },
-                            child: Text("Single-Player")),
-                        FilledButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/guess');
-                            },
-                            child: Text("Multi-Player")),
+                            child: Text("Single Player Match")),
+                        SizedBox(height: 12),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: 64,
+                          child: TextEntryPill(
+                            controller: roomCodeController,
+                            icon: Icon(
+                              Icons.qr_code_2_rounded,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer,
+                            ),
+                            hintText: "room code",
+                            obscured: false,
+                          ),
+                        ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FilledButton(
+                                  onPressed: () {
+                                    // TODO: create room
+                                  },
+                                  child: Text("Create Room")),
+                              SizedBox(width: 16),
+                              FilledButton(
+                                  onPressed: () {
+                                    // TODO: join room
+                                  },
+                                  child: Text("Join Room")),
+                            ]),
                         Spacer(),
                         Row(
                             mainAxisSize: MainAxisSize.max,
@@ -68,19 +98,10 @@ class _HomePageState extends State<HomePage> {
                                         .onSecondaryContainer,
                                   )),
                               FilledButton.tonal(
-                                  onPressed: () => {},
-                                  // TODO: implement store
+                                  onPressed: () => { Navigator.pushNamed(context, '/login')},
+                                  // TODO: implement logout
                                   child: Icon(
-                                    Icons.store_rounded,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondaryContainer,
-                                  )),
-                              FilledButton.tonal(
-                                  onPressed: () => {},
-                                  // TODO: implement achievements
-                                  child: Icon(
-                                    Icons.star_rounded,
+                                    Icons.exit_to_app_rounded,
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSecondaryContainer,
