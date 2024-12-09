@@ -10,6 +10,7 @@ import 'routes.dart';
 List<CameraDescription> cameras = [];
 bool soundEnabled = true;
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
+int roundNumber = 0;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

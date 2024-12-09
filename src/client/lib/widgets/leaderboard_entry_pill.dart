@@ -33,13 +33,15 @@ class LeaderboardEntryPill extends StatelessWidget {
             Rank.other => Theme.of(context).colorScheme.primary,
           },
           highlightColor: switch (rank) {
-            Rank.first || Rank.second || Rank.third => Color(0xFFD5D5D5),
+            Rank.first => Color(0xFFE8D38B),
+            Rank.second => Color(0xFFA6A6A6),
+            Rank.third => Color(0xFF988468),
             Rank.other => Theme.of(context).colorScheme.primary
           },
           child: Container(
               decoration: BoxDecoration(
                   color: switch (rank) {
-                    Rank.first => Color(0xFFC41221),
+                    Rank.first => Color(0xFFC49812),
                     Rank.second => Color(0xFF757677),
                     Rank.third => Color(0xFF80683D),
                     Rank.other => Theme.of(context).colorScheme.primary,

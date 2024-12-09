@@ -1,6 +1,7 @@
 import 'package:direction_guesser/pages/guess.dart';
 import 'package:direction_guesser/pages/home.dart';
 import 'package:direction_guesser/pages/profile.dart';
+import 'package:direction_guesser/pages/results.dart';
 import 'package:direction_guesser/pages/score.dart';
 import 'package:direction_guesser/pages/settings.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => GuessPage());
     case '/score':
       return MaterialPageRoute(builder: (context) => ScorePage(city: settings.arguments.toString()));
+    case '/results':
+      return MaterialPageRoute(builder: (context) => ResultsPage());
     case '/profile':
       return MaterialPageRoute(builder: (context) => ProfilePage());
     case '/settings':

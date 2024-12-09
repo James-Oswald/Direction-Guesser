@@ -69,27 +69,31 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ValueListenableBuilder<PermissionsState>(
-            valueListenable: permissionState,
-            builder: (_, PermissionsState permissions, child) {
-              if (permissions == PermissionsState.gpsServicesUnavailable) {
-                return MissingDeviceCard(
-                    mainText: "Your device is missing either GPS or a compass.",
-                    subText: "Without these, you are unable to play.");
-              } else if (permissions == PermissionsState.cameraUnavailable) {
-                return MissingDeviceCard(
-                    mainText: "Your device is missing a suitable camera.",
-                    subText: "Without this, you are unable to play.");
-              } else if (permissions == PermissionsState.cameraDenied) {
-                return needCameraUI();
-              } else if (permissions == PermissionsState.locationDenied ||
-                  permissions == PermissionsState.bothDenied) {
-                return needLocationsUI();
-              } else {
-                return guessUI();
-              }
-            }));
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+            body: ValueListenableBuilder<PermissionsState>(
+                valueListenable: permissionState,
+                builder: (_, PermissionsState permissions, child) {
+                  if (permissions == PermissionsState.gpsServicesUnavailable) {
+                    return MissingDeviceCard(
+                        mainText:
+                            "Your device is missing either GPS or a compass.",
+                        subText: "Without these, you are unable to play.");
+                  } else if (permissions ==
+                      PermissionsState.cameraUnavailable) {
+                    return MissingDeviceCard(
+                        mainText: "Your device is missing a suitable camera.",
+                        subText: "Without this, you are unable to play.");
+                  } else if (permissions == PermissionsState.cameraDenied) {
+                    return needCameraUI();
+                  } else if (permissions == PermissionsState.locationDenied ||
+                      permissions == PermissionsState.bothDenied) {
+                    return needLocationsUI();
+                  } else {
+                    return guessUI();
+                  }
+                })));
   }
 
   Container guessUI() {
