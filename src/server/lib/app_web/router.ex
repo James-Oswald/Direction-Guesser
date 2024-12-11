@@ -47,8 +47,9 @@ defmodule AppWeb.Router do
 
   defp resp_actor!(conn, actor) do
     with {:ok, msg}   <- parse_req_msg(conn),
-         {:ok, reply} <- GenServer.call(actor, msg)
+         reply        <- unwrap!(GenServer.call(actor, msg))
     do
+     Logger.debug("(router): #{inspect(reply)}")
      conn
      |> put_resp_content_type("application/json")
      |> resp_j(200, reply)
@@ -71,6 +72,10 @@ defmodule AppWeb.Router do
         {:error, :bad_req_msg_format}
     end
   end
+
+  defp unwrap!({:ok,    reply}), do: reply
+  defp unwrap!({:error, reply}), do: raise reply
+  defp unwrap!(reply          ), do: reply
  # ---
   # NOTE: jason doesn't support encoding Tuples (for reasoning, see:
   # https://github.com/michalmuskala/jason/pull/52). i don't need a
