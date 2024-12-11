@@ -1,5 +1,7 @@
+import 'package:cross_file_image/cross_file_image.dart';
 import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -13,8 +15,11 @@ class _ProfilePageState extends State<ProfilePage> {
   // TODO: set these to empty once backend is hooked up
   String username = "default-user";
   String email = "myemail@email.com";
-  AssetImage profilePicture = AssetImage("assets/default_profile_picture.png");
+  Image? profilePicture;
+  AssetImage defaultProfilePicture =
+      AssetImage("assets/default_profile_picture.png");
   bool success = false;
+  ImagePicker imagePicker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +54,41 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 128),
-                    SizedBox(
-                        height: 128,
-                        width: 128,
-                        child: CircleAvatar(
-                            foregroundImage: profilePicture,
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer)),
+                    Stack(children: [
+                      SizedBox(
+                          height: 128,
+                          width: 128,
+                          child: CircleAvatar(
+                              foregroundImage: (profilePicture == null)
+                                  ? defaultProfilePicture
+                                  : profilePicture!.image,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer)),
+                      SizedBox(
+                          height: 132,
+                          width: 164,
+                          child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: IconButton(
+                                  onPressed: () async {
+                                    XFile? file = await imagePicker.pickImage(
+                                        source: ImageSource.gallery);
+                                    if (file != null) {
+                                      setState(() {
+                                        profilePicture =
+                                            Image(image: XFileImage(file));
+                                        // TODO: send this image to the backend to have persistence
+                                      });
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.edit_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                  ))))
+                    ]),
                     SizedBox(height: 16),
                     Text("username: $username",
                         style: titleLargeStyle, textAlign: TextAlign.center),
