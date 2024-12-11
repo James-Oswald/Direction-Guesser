@@ -12,7 +12,7 @@ defmodule App.Application do
       App.Supervisor.Users,
       App.Auth,
       App.Process,
-      {Registry, keys: :unique, name: App.LobbyRegistry},
+      App.Supervisor.Lobby,
       AppWeb.Endpoint,
     ]
 
