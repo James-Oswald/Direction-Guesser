@@ -8,7 +8,6 @@ defmodule App.Lobby do
       time_per_round: 15,
       number_of_rounds: 1
     }
-
     state = Map.merge(defaults, params)
     GenServer.start_link(__MODULE__, %{name: name, state: state, users: %{}, round_data: []}, name: via_tuple(name))
   end
@@ -67,7 +66,6 @@ defmodule App.Lobby do
       updated_users = Map.update!(state.users, user_pid, &Map.put(&1, :ready, true))
 
       if Enum.all?(updated_users, fn {_pid, %{ready: ready}} -> ready end) do
-        # Start round countdown
         Process.send_after(self(), :start_round, 0)
         {:reply, {:ok, "All users ready. Starting round!"}, %{state | users: updated_users}}
       else
@@ -80,7 +78,6 @@ defmodule App.Lobby do
 
   def handle_call({:submit_guess, user_pid, guess_data}, _from, state) do
     if Map.has_key?(state.users, user_pid) do
-      # Call external process to calculate score
       score = App.Process.calculate_score(guess_data)
 
       updated_users = Map.update!(state.users, user_pid, &Map.put(&1, :score, score))
