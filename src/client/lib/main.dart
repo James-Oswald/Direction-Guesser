@@ -17,10 +17,8 @@ Future<void> main() async {
   // poll available cameras on startup to prepare for guess screen
   cameras = await availableCameras();
   runApp(MultiProvider(providers: [
-    Provider(create: (_) {
-      UsersServices();
-      GameServices();
-    })
+    Provider<UsersServices>(create: (context) => UsersServices()),
+    Provider<GameServices>(create: (context) => GameServices())
   ], child: MainApp()));
 }
 

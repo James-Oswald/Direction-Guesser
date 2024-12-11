@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,9 +8,7 @@ class GameServices {
   Future<String> randomCity() async {
     final url = Uri.parse('http://10.0.2.2:8080/api/process');
 
-    final body = jsonEncode({
-        'random_city': {}
-    });
+    final body = jsonEncode({'random_city': {}});
 
     final response = await http.post(
       url,
@@ -33,7 +32,7 @@ class GameServices {
       'session_id': sessionId,
       'latitude': latitude,
       'longitude': longitude,
-      'headings': headings
+      'heading': headings
     });
 
     // Send POST request to /game/guess TODO: update endpoint

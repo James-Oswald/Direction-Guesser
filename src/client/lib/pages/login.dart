@@ -157,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> submit(BuildContext context) async {
     // TODO: this is a quick fix for demos
     // remove once backend is integrated
-    Navigator.pushNamed(context, '/home');
+    // Navigator.pushNamed(context, '/home');
 
     // Use async/await for better readability and error handling
     bool isLoggedIn = await context.read<UsersServices>().loginUser(
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
         passwordController
             .text // assuming genderController is a TextEditingController
         );
-
+    print("loggedIn: $isLoggedIn");
     // Check the result of registration
     if (isLoggedIn) {
       // Show success message and navigate back to home
