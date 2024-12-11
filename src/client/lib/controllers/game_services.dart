@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,9 +8,7 @@ class GameServices {
   Future<String> randomCity(double latitude, double longitude) async {
     final url = Uri.parse('http://10.0.2.2:8080/api/process');
 
-    final body = jsonEncode({
-        'calculate_nearby': {'user_lat': latitude, 'user_lon': longitude, 'range': 20}
-    });
+    final body = jsonEncode({'random_city': {}});
 
     final response = await http.post(
       url,
@@ -30,11 +29,10 @@ class GameServices {
 
     // create the body with all of the information needed for a guess
     final body = jsonEncode({
-        'user_bearing': user_bearing,
-        'user_lat': user_lat,
-        'user_lon': user_lon,
-        'target_lat': target_lat,
-        'target_lon': target_lon
+      'session_id': sessionId,
+      'latitude': latitude,
+      'longitude': longitude,
+      'heading': headings
     });
 
     // Send POST request to /game/guess TODO: update endpoint
