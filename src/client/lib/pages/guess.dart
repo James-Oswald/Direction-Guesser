@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
-
 import 'package:camera/camera.dart';
 import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +45,6 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   bool newGame = true;
   List<Map<String, dynamic>> cities = [];
   String targetCity = "";
-
-  // TODO: this should be queried from the back end
-  // and NOT queried on every rebuild, only once
-  String city = "Bethlehem Central Middle School";
 
   @override
   void initState() {
@@ -132,8 +126,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                 child: Column(mainAxisSize: MainAxisSize.max, children: [
               Spacer(),
               Text("Point to...", style: largeStyle),
-              Text(city,
-                  // TODO: this should come from the backend
+              Text(targetCity,
                   style: TextStyle(
                       fontStyle:
                           Theme.of(context).textTheme.displayMedium?.fontStyle,
@@ -153,7 +146,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                     if (tryAgain) {
                       tryAgain = false;
                     } else {
-                      submitGuess(context, city);
+                      submitGuess(context, targetCity);
                     }
                   },
                   onTimerInitiated: () {

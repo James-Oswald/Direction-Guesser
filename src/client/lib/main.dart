@@ -28,16 +28,23 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: MaterialTheme(Theme.of(context).textTheme)
-            .theme(MaterialTheme.lightScheme()),
-        darkTheme: MaterialTheme(Theme.of(context).textTheme)
-            .theme(MaterialTheme.darkScheme()),
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: generateRoute,
-        home: SplashScreen()
-    );
+    return ValueListenableBuilder<ThemeMode>(
+        valueListenable: themeNotifier,
+        builder: (_, mode, __) {
+          return MaterialApp(
+              theme: MaterialTheme(Theme
+                  .of(context)
+                  .textTheme)
+                  .theme(MaterialTheme.lightScheme()),
+              darkTheme: MaterialTheme(Theme
+                  .of(context)
+                  .textTheme)
+                  .theme(MaterialTheme.darkScheme()),
+              themeMode: mode,
+              debugShowCheckedModeBanner: false,
+              onGenerateRoute: generateRoute,
+              home: SplashScreen());
+        });
   }
 }
 
@@ -69,9 +76,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-      )), // Splash/loading screen
+      body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+                Theme
+                    .of(context)
+                    .colorScheme
+                    .primary),
+          )), // Splash/loading screen
     );
   }
 }
