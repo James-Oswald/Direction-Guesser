@@ -32,9 +32,13 @@ class MainApp extends StatelessWidget {
         valueListenable: themeNotifier,
         builder: (_, mode, __) {
           return MaterialApp(
-              theme: MaterialTheme(Theme.of(context).textTheme)
+              theme: MaterialTheme(Theme
+                  .of(context)
+                  .textTheme)
                   .theme(MaterialTheme.lightScheme()),
-              darkTheme: MaterialTheme(Theme.of(context).textTheme)
+              darkTheme: MaterialTheme(Theme
+                  .of(context)
+                  .textTheme)
                   .theme(MaterialTheme.darkScheme()),
               themeMode: mode,
               debugShowCheckedModeBanner: false,
@@ -73,9 +77,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
           child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary),
-      )), // Splash/loading screen
+            valueColor: AlwaysStoppedAnimation<Color>(
+                Theme
+                    .of(context)
+                    .colorScheme
+                    .primary),
+          )), // Splash/loading screen
     );
   }
 }
