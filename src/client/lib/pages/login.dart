@@ -2,6 +2,7 @@ import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/widgets/text_entry_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+ 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -169,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> submit(BuildContext context) async {
     // TODO: this is a quick fix for demos
     // remove once backend is integrated
-    Navigator.pushNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/home');
 
     // Use async/await for better readability and error handling
     bool isLoggedIn = await context.read<UsersServices>().loginUser(
