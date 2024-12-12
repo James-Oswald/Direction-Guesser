@@ -1,5 +1,6 @@
 import 'package:direction_guesser/main.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({required this.city}) : super();
@@ -11,9 +12,20 @@ class ScorePage extends StatefulWidget {
 }
 
 class _ScorePageState extends State<ScorePage> {
+
+  String? score;
+
   @override
   void initState() {
     super.initState();
+    _getScore();
+  }
+
+  void _getScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      score = prefs.getString('score');
+    });
   }
 
   @override
@@ -65,7 +77,7 @@ class _ScorePageState extends State<ScorePage> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 16),
-                  Text("25.55° off",
+                  Text("XX.XX° off",
                       style: TextStyle(
                           fontStyle: Theme.of(context)
                               .textTheme
@@ -79,7 +91,7 @@ class _ScorePageState extends State<ScorePage> {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text("87",
+                        Text(score ?? "0",
                             style: TextStyle(
                                 fontStyle: Theme.of(context)
                                     .textTheme
