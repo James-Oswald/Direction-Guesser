@@ -5,12 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UsersServices {
 
-  String deviceUrl = 'http://localhost:8080';
-  String emulatorUrl = 'http://10.0.2.2:8080';
-  String productionUrl = 'http://dirg.ieeeualbany.org';
+  String serverUrl = 'http://localhost:8080'; //localhost
+  //String serverUrl = 'http://10.0.2.2:8080'; //Android emulator
+  //String serverUrl = 'http://dirg.ieeeualbany.org'; //Server
 
   Future<bool> loginUser(String username, String password) async {
-    final url = Uri.parse('$deviceUrl/api/auth/');
+    final url = Uri.parse('$serverUrl/api/auth/');
 
     final body = jsonEncode({
       'sign_in': {'username': username, 'password': password}
@@ -51,7 +51,7 @@ class UsersServices {
       return false;
     }
 
-    final url = Uri.parse('$deviceUrl/api/auth/');
+    final url = Uri.parse('$serverUrl/api/auth/');
 
     // Send POST request to /logout with session ID in headers
     final response = await http.post(
@@ -82,7 +82,7 @@ class UsersServices {
       return false;
     }
 
-    final url = Uri.parse('$deviceUrl/api/user/$username');
+    final url = Uri.parse('$serverUrl/api/user/$username');
 
     // Send GET request with session ID in headers
     final response = await http.get(
@@ -104,7 +104,7 @@ class UsersServices {
   }
 
   Future<bool> registerUser(String username, String email, String password, String? age, String? gender) async {
-    final url = Uri.parse('$deviceUrl/api/auth/');
+    final url = Uri.parse('$serverUrl/api/auth/');
 
     // Create JSON body for the request
     final body = jsonEncode({
