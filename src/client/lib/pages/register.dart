@@ -243,11 +243,9 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> submit(BuildContext context) async {
     // Use async/await for better readability and error handling
     bool isRegistered = await context.read<UsersServices>().registerUser(
-        usernameController.text,
-        emailController.text,
-        passwordController.text,
-        ageController.text,
-        genderController
+        usernameController.text, emailController.text, passwordController.text, ageController.text, genderController
+        // TODO: REST API signup call
+        // TODO: Add age, gender
         );
 
     // Check the result of registration

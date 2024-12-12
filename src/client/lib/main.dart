@@ -4,6 +4,7 @@ import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'routes.dart';
 
@@ -27,26 +28,51 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-        valueListenable: themeNotifier,
-        builder: (_, mode, __) {
-          return MaterialApp(
-              theme: MaterialTheme(Theme.of(context).textTheme)
-                  .theme(MaterialTheme.lightScheme()),
-              darkTheme: MaterialTheme(Theme.of(context).textTheme)
-                  .theme(MaterialTheme.darkScheme()),
-              themeMode: mode,
-              debugShowCheckedModeBanner: false,
-              onGenerateRoute: generateRoute,
-              initialRoute: CheckSessionStatus() ? '/home' : '/login');
-        });
+    return MaterialApp(
+        theme: MaterialTheme(Theme.of(context).textTheme)
+            .theme(MaterialTheme.lightScheme()),
+        darkTheme: MaterialTheme(Theme.of(context).textTheme)
+            .theme(MaterialTheme.darkScheme()),
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        onGenerateRoute: generateRoute,
+        home: SplashScreen()
+    );
   }
 }
 
-bool CheckSessionStatus() {
-  // Check if the user is logged in
-  // If the user is logged in, return true
-  // If the user is not logged in, return false
-  //TODO: Implement this function
-  return false;
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
 }
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkSessionStatus(); // Check session status asynchronously
+  }
+
+  Future<void> _checkSessionStatus() async {
+    await Future.delayed(Duration(seconds: 1)); // Optional delay for better UX
+    final prefs = await SharedPreferences.getInstance();
+    var sessionId = prefs.getString('sessionId');
+
+    if (sessionId != null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+      )), // Splash/loading screen
+    );
+  }
+}
+
