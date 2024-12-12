@@ -325,8 +325,8 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
           headings,
           latitude,
           longitude,
-          42.6204,
-          -73.8257
+          targetLatitude,
+          targetLongitude
           );
     }
 

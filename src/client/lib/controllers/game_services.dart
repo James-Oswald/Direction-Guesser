@@ -43,13 +43,17 @@ class GameServices {
         headers: {'Content-Type': 'application/JSON'},
         body: body,
       );
-      jsonDecode(response.body).map((data) {
-        return {
-          "name": data["name"],
-          "latitude": data["coord"][0], // Longitude
-          "longitude": data["coord"][1], // Latitude
-        };
-      }).toList();
+      final data = jsonDecode(response.body);
+
+      String name= data[0][1]; // Name
+      dynamic longitude= data[1][1][0]; // Longitude
+      dynamic latitude= data[1][1][1];
+      
+      cities.add({
+          "name": name, // Name
+          "longitude": longitude, // Longitude
+          "latitude": latitude // Latitude
+        });
     }
 
     return cities;
@@ -57,15 +61,17 @@ class GameServices {
 
   Future<bool> sendGuess(List<double> user_bearing, double user_lat, double user_lon, double target_lat, double target_lon) async {
     // TODO: we haven't decided on an endpoint for this yet
-    final url = Uri.parse('$serverUrl/game/guess');
-
+    final url = Uri.parse('$serverUrl/api/process');
+    final double avg_user_bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
     // create the body with all of the information needed for a guess
     final body = jsonEncode({
-        'user_bearing': user_bearing,
+      'calculate_score': {
+        'user_bearing': avg_user_bearing,
         'user_lat': user_lat,
         'user_lon': user_lon,
         'target_lat': target_lat,
         'target_lon': target_lon
+      }
     });
 
     // Send POST request to /game/guess TODO: update endpoint
@@ -85,8 +91,82 @@ class GameServices {
 
       // Store the resulting score in shared preferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('score', score);
+      await prefs.setString('score', score.toString());
 
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> createLobby(String lobbyName) async {
+    final url = Uri.parse('$serverUrl/api/lobby');
+
+    final body = jsonEncode({
+      'start_link': {
+        'name': lobbyName
+      }
+    });
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/JSON'},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> joinLobby(String lobbyName) async {
+    final url = Uri.parse('$serverUrl/api/lobby');
+
+    final body = jsonEncode({
+      'join_link': {
+        'name': lobbyName
+      }
+    });
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/JSON'},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> getLobbyInfo(String lobbyName) async {
+    final url = Uri.parse('$serverUrl/api/lobby/$lobbyName');
+
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/JSON'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Lobby data: $data');
+    }
+    return false;
+  }
+
+  Future<bool> readyUp() async {
+    final url = Uri.parse('$serverUrl/api/lobby/ready');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/JSON'},
+    );
+
+    if (response.statusCode == 200) {
       return true;
     } else {
       return false;
