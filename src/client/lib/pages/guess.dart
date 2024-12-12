@@ -42,6 +42,11 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   List<double> headings = [];
   bool collectingHeadings = false;
   bool tryAgain = false;
+  double targetLatitude = 0.0;
+  double targetLongitude = 0.0;
+  bool newGame = true;
+  List<Map<String, dynamic>> cities = [];
+  String targetCity = "";
 
   // TODO: this should be queried from the back end
   // and NOT queried on every rebuild, only once
@@ -424,6 +429,22 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
       // made it through every check, permissions are good
       permissionState.value = PermissionsState.okay;
     });
+
+    //Get the list of cities
+    if (newGame) {
+      var location = await Geolocator.getCurrentPosition();
+      //String city = await context.read<GameServices>().randomCity(location.latitude, location.longitude);
+      cities = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 5);
+      newGame = false;
+      if (cities.isEmpty) {
+        permissionState.value = PermissionsState.gpsServicesUnavailable;
+        return;
+      }
+    }
+    targetCity = cities[0]['name'];
+    targetLatitude = cities[0]['latitude'];
+    targetLongitude = cities[0]['longitude'];
+    cities.removeAt(0);
   }
 
   @override
