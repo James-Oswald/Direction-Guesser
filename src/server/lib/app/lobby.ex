@@ -84,9 +84,9 @@ defmodule App.Lobby do
   end
 
   @impl true
-  def handle_call({:submit_guess, user_pid, guess_data}, _from, state) do
+  def handle_call({:submit_guess, user_pid, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, _from, state) do
     if Map.has_key?(state.users, user_pid) do
-      score = App.Process.calculate_score(guess_data)
+      score = GenServer.call(App.Process, {:calculate_score, guess_data})
 
       updated_users = Map.update!(state.users, user_pid, &Map.put(&1, :score, score))
       {:reply, {:ok, "Guess submitted"}, %{state | users: updated_users}}
