@@ -16,7 +16,7 @@ defmodule AppWeb.Router do
 
   post "/api/user" do
     conn
-    |> resp_actor((conn |> get_req_header("x-auth-token") |> Enum.at(0)))
+    |> resp_actor({:global, (conn |> get_req_header("x-auth-token") |> Enum.at(0))})
     |> send_resp()
   end
 

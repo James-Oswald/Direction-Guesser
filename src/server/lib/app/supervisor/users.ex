@@ -8,9 +8,9 @@ defmodule App.Supervisor.Users do
   def start_user(user) do
     case DynamicSupervisor.start_child(__MODULE__, {User, user}) do
       {:ok, _pid} ->
-        {:ok, {:global, user.id}}
+        {:ok, user.id}
       {:error, {:already_started, _pid}} ->
-        {:ok, {:global, user.id}}
+        {:ok, user.id}
     end
   end
 
