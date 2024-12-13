@@ -22,7 +22,7 @@ defmodule App.Process do
     correct_bearing = calculate_bearing(user_lat, user_lon, target_lat, target_lon)
     diff = abs(user_bearing - correct_bearing)
     accuracy = max(0, 100 - (diff / 180) * 100)
-    round(accuracy)
+    [score: round(accuracy), deg_off: diff]
   end
  # ---
   defp calculate_nearby(user_lat, user_lon, range) do

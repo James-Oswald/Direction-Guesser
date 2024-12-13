@@ -87,11 +87,14 @@ class GameServices {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       /* e.g. 93 */
-      final score = data;
+      final score = data[0][1];
+      /* e.g. degrees off */
+      final deg_off = data[1][1];
 
       // Store the resulting score in shared preferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('score', score.toString());
+      await prefs.setString('deg_off', deg_off.toString());
 
       return true;
     } else {
