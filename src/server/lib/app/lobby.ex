@@ -1,5 +1,6 @@
 defmodule App.Lobby do
   use GenServer
+  alias App.DB
 
   require Logger
 
@@ -56,6 +57,8 @@ defmodule App.Lobby do
       {:reply, {:error, "User already in this lobby"}, lobby}
     else
       updated_users = Map.put(lobby.users, user_pid, %{score: nil, ready: false})
+      DB.insert!(Ecto.Changeset.change(lobby, %{users: updated_users}))
+
       {:reply, :ok, %{lobby | users: updated_users}}
     end
   end

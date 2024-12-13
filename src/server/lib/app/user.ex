@@ -1,5 +1,6 @@
 defmodule App.User do
   alias App.DB
+  import Ecto.Query, only: [from: 2]
 
   require Logger
 
@@ -18,7 +19,11 @@ defmodule App.User do
 
   defp lobby_join(user, lobby_id) do
     Logger.info("(u#{user.id}): joining lobby (#{lobby_id})")
-    GenServer.call({:global, lobby_id}, {:join, Kernel.self()})
+    GenServer.call({:global, lobby_id}, {:join, "u#{user.id}"})
+  end
+
+  defp lobby_get(user) do
+    App.DB.all(App.Lobby.Schema) |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first
   end
  # ---
   use GenServer
@@ -48,6 +53,11 @@ defmodule App.User do
   def handle_call({:lobby_join, %{id: id}}, _from, state) do
     Logger.info("(u#{state.id}): joining lobby #{id}")
     {:reply, lobby_join(state, id), state}
+  end
+
+  @impl true
+  def handle_call({:lobby_get, _}, _from, state) do
+    {:reply, lobby_get(state), state}
   end
  # ---
 end

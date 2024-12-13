@@ -20,6 +20,12 @@ defmodule AppWeb.Router do
     |> send_resp()
   end
 
+  post "/api/lobby" do
+    conn
+    |> resp_actor({:global, "l#{GenServer.call({:global, (conn |> get_req_header("x-auth-token") |> Enum.at(0))}, {:lobby_get, %{}}).id}"})
+    |> send_resp()
+  end
+
   post "/api/process" do
     conn
     |> resp_actor(App.Process)
