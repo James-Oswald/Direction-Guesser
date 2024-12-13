@@ -12,6 +12,7 @@ List<CameraDescription> cameras = [];
 bool soundEnabled = true;
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 int roundNumber = 0;
+Map<String, Map<String, String>> scores = {};
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,8 @@ class MainApp extends StatelessWidget {
         valueListenable: themeNotifier,
         builder: (_, mode, __) {
           return MaterialApp(
+              //To remove the debug banner
+              debugShowCheckedModeBanner: false,
               theme: MaterialTheme(Theme
                   .of(context)
                   .textTheme)
@@ -41,7 +44,6 @@ class MainApp extends StatelessWidget {
                   .textTheme)
                   .theme(MaterialTheme.darkScheme()),
               themeMode: mode,
-              debugShowCheckedModeBanner: false,
               onGenerateRoute: generateRoute,
               home: SplashScreen());
         });
@@ -62,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkSessionStatus() async {
-    await Future.delayed(Duration(seconds: 1)); // Optional delay for better UX
+    await Future.delayed(Duration(seconds: 2)); // Optional delay for better UX
     final prefs = await SharedPreferences.getInstance();
     var sessionId = prefs.getString('x-auth-token');
 

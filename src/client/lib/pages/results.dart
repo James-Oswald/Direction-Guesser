@@ -1,3 +1,4 @@
+import 'package:direction_guesser/main.dart';
 import 'package:flutter/material.dart';
 
 class ResultsPage extends StatefulWidget {
@@ -53,17 +54,23 @@ class _ResultsPageState extends State<ResultsPage> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    "City 1: 100 points",
+                    scores.containsKey("score0") && scores["score0"] != null
+                      ? "${scores["score0"]?["city"]}: ${scores["score0"]?["score"]} points"
+                      : "No data available",
                     style: displaySmallStyle,
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    "City 2: 65 points",
+                    scores.containsKey("score1") && scores["score1"] != null
+                      ? "${scores["score1"]?["city"]}: ${scores["score1"]?["score"]} points"
+                      : "No data available",
                     style: displaySmallStyle,
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    "City 3: 92 points",
+                    scores.containsKey("score2") && scores["score2"] != null
+                      ? "${scores["score2"]?["city"]}: ${scores["score2"]?["score"]} points"
+                      : "No data available",
                     style: displaySmallStyle,
                     textAlign: TextAlign.center,
                   ),

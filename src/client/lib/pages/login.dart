@@ -50,104 +50,113 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Spacer(),
-                Image.asset(
-                  "assets/logo.png",
-                  width: 300,
-                  height: 300,
-                ),
-                Spacer(),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  height: 64,
-                  child: TextEntryPill(
-                    controller: usernameController,
-                    icon: Icon(
-                      Icons.person_rounded,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
-                    hintText: "username",
-                    obscured: false,
+          body: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Spacer(),
+                      Image.asset(
+                        "assets/logo.png",
+                        width: 300,
+                        height: 300,
+                      ),
+                      Spacer(),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: 64,
+                        child: TextEntryPill(
+                          controller: usernameController,
+                          icon: Icon(
+                            Icons.person_rounded,
+                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          ),
+                          hintText: "username",
+                          obscured: false,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: 64,
+                        child: TextEntryPill(
+                            controller: passwordController,
+                            icon: Icon(
+                              Icons.key_rounded,
+                              color:
+                                  Theme.of(context).colorScheme.onSecondaryContainer,
+                            ),
+                            hintText: "password",
+                            obscured: true),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(children: [
+                          SizedBox(width: 64),
+                          // TODO: forgot password needs functionality
+                          Text(
+                            "Forgot password?",
+                            textAlign: TextAlign.left,
+                            style: labelSmallStyle,
+                          )
+                        ]),
+                      ),
+                      FilledButton(
+                          onPressed: () => submit(context),
+                          style: FilledButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                                fontStyle:
+                                    Theme.of(context).textTheme.labelLarge?.fontStyle,
+                                fontSize:
+                                    Theme.of(context).textTheme.labelLarge?.fontSize),
+                            selectionColor:
+                                Theme.of(context).colorScheme.onPrimaryContainer,
+                          )),
+                      SizedBox(height: 64),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "New?",
+                            textAlign: TextAlign.left,
+                            style: headlineSmallStyle,
+                          ),
+                          SizedBox(width: 24),
+                          FilledButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/register');
+                              },
+                              style: FilledButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primaryContainer,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimaryContainer,
+                              ),
+                              child: Text(
+                                "Sign Up",
+                                style: labelLargeStyle,
+                                selectionColor:
+                                    Theme.of(context).colorScheme.onPrimaryContainer,
+                              )),
+                        ],
+                      ),
+                      Spacer()
+                    ],
                   ),
                 ),
-                SizedBox(height: 8),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  height: 64,
-                  child: TextEntryPill(
-                      controller: passwordController,
-                      icon: Icon(
-                        Icons.key_rounded,
-                        color:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
-                      ),
-                      hintText: "password",
-                      obscured: true),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(children: [
-                    SizedBox(width: 64),
-                    // TODO: forgot password needs functionality
-                    Text(
-                      "Forgot password?",
-                      textAlign: TextAlign.left,
-                      style: labelSmallStyle,
-                    )
-                  ]),
-                ),
-                FilledButton(
-                    onPressed: () => submit(context),
-                    style: FilledButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                          fontStyle:
-                              Theme.of(context).textTheme.labelLarge?.fontStyle,
-                          fontSize:
-                              Theme.of(context).textTheme.labelLarge?.fontSize),
-                      selectionColor:
-                          Theme.of(context).colorScheme.onPrimaryContainer,
-                    )),
-                SizedBox(height: 64),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "New?",
-                      textAlign: TextAlign.left,
-                      style: headlineSmallStyle,
-                    ),
-                    SizedBox(width: 24),
-                    FilledButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/register');
-                        },
-                        style: FilledButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
-                        child: Text(
-                          "Sign Up",
-                          style: labelLargeStyle,
-                          selectionColor:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                        )),
-                  ],
-                ),
-                Spacer()
-              ],
+              ),
             ),
           ),
         ),
@@ -158,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> submit(BuildContext context) async {
     // TODO: this is a quick fix for demos
     // remove once backend is integrated
-    Navigator.pushReplacementNamed(context, '/home');
+    // Navigator.pushReplacementNamed(context, '/home');
 
     // Use async/await for better readability and error handling
     bool isLoggedIn = await context.read<UsersServices>().loginUser(
