@@ -5,12 +5,12 @@ defmodule App.Supervisor.Lobbies do
 
   use DynamicSupervisor
 
-  def start_lobby(name, params \\ %{}) do
-    case DynamicSupervisor.start_child(__MODULE__, {Lobby, %{name: name, params: params}}) do
+  def start_lobby(lobby) do
+    case DynamicSupervisor.start_child(__MODULE__, {Lobby, lobby}) do
       {:ok, _pid} ->
-        {:ok, {:global, name}}
+        {:ok, lobby.id}
       {:error, {:already_started, _pid}} ->
-        {:ok, {:global, name}}
+        {:ok, lobby.id}
     end
   end
 
