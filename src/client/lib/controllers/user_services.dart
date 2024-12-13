@@ -33,9 +33,7 @@ class UsersServices {
 
       // Store the session ID temporarily using shared preferences library in the future will move to user model
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', username);
-      await prefs.setString('password', password);
-      await prefs.setString('sessionId', sessionId);
+      await prefs.setString('x-auth-token', sessionId);
 
       return true;
     } else {
@@ -67,8 +65,6 @@ class UsersServices {
     if (response.statusCode == 200) {
       // Remove session ID from shared preferences
       await prefs.remove('x-auth-token');
-      await prefs.remove('username');
-      await prefs.remove('password');
       return true;
     } else {
       return false;

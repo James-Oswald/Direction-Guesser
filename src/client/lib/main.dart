@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkSessionStatus() async {
     await Future.delayed(Duration(seconds: 1)); // Optional delay for better UX
     final prefs = await SharedPreferences.getInstance();
-    var sessionId = prefs.getString('sessionId');
+    var sessionId = prefs.getString('x-auth-token');
 
     if (sessionId != null) {
       Navigator.pushReplacementNamed(context, '/home');
