@@ -44,7 +44,6 @@ defmodule App.Lobby do
         time_per_round: lobby.time_per_round,
         last_round_scores: lobby.round_data
       }
-
       {:reply, {:ok, info}, lobby}
     else
       {:reply, {:error, "User not associated with this lobby"}, lobby}
@@ -57,7 +56,7 @@ defmodule App.Lobby do
       {:reply, {:error, "User already in this lobby"}, lobby}
     else
       updated_users = Map.put(lobby.users, user_pid, %{score: nil, ready: false})
-      DB.insert!(Ecto.Changeset.change(lobby, %{users: updated_users}))
+      DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
 
       {:reply, :ok, %{lobby | users: updated_users}}
     end
@@ -69,10 +68,11 @@ defmodule App.Lobby do
       updated_users = Map.update!(lobby.users, user_pid, &Map.put(&1, :ready, true))
 
       if all_users_ready?(updated_users) do
-        Process.send_after(self(), :start_round, lobby.time_per_round * 1000)
-        {:reply, {:ok, "All users ready. Starting round!"}, %{lobby | users: updated_users}}
+        DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
+        {:reply, {:ok, GenServer.call(App.Process, {:calculate_nearby, %{user_lat: 42.687, user_lon: -73.824, range: 20}})}, %{lobby | users: updated_users}}
       else
-        {:reply, {:ok, "User marked as ready"}, %{lobby | users: updated_users}}
+        Process.sleep(500)
+        GenServer.call(Kernel.self(), {:readyup, user_pid})
       end
     else
       {:reply, {:error, "User not in this lobby"}, lobby}
@@ -85,6 +85,9 @@ defmodule App.Lobby do
       score = GenServer.call(App.Process, {:calculate_score, guess_data})
 
       updated_users = Map.update!(lobby.users, user_pid, &Map.put(&1, :score, score))
+      DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
+
+
       {:reply, {:ok, "Guess submitted"}, %{lobby | users: updated_users}}
     else
       {:reply, {:error, "User not in this lobby"}, lobby}
@@ -96,7 +99,7 @@ defmodule App.Lobby do
     updated_round_data = Enum.map(lobby.users, fn {user_pid, %{score: score}} ->
       %{user: user_pid, score: score || 0} #0 if no guess
     end)
-
+    DB.update!(Ecto.Changeset.change(lobby, %{ round_data: updated_round_data}))
     {:noreply, %{lobby | round_data: updated_round_data}}
   end
 

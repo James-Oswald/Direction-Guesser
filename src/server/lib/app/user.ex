@@ -22,6 +22,16 @@ defmodule App.User do
     GenServer.call({:global, lobby_id}, {:join, "u#{user.id}"})
   end
 
+  defp lobby_ready(user) do
+    lobby = lobby_get(user)
+    GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}"})
+  end
+
+  defp lobby_submit(user, guess_data) do
+    lobby = lobby_get(user)
+    GenServer.call({:global, "l#{lobby.id}"}, {:submit, "u#{user.id}", guess_data})
+  end
+
   defp lobby_get(user) do
     App.DB.all(App.Lobby.Schema) |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first
   end
@@ -53,6 +63,18 @@ defmodule App.User do
   def handle_call({:lobby_join, %{id: id}}, _from, state) do
     Logger.info("(u#{state.id}): joining lobby #{id}")
     {:reply, lobby_join(state, id), state}
+  end
+
+  @impl true
+  def handle_call({:lobby_ready, _}, _from, state) do
+    Logger.info("(u#{state.id}): readying up")
+    {:reply, lobby_ready(state), state}
+  end
+
+  @impl true
+  def handle_call({:lobby_submit, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, _from, state) do
+    Logger.info("(u#{state.id}): submitting guess #{guess_data}")
+    {:reply, lobby_submit(state, guess_data), state}
   end
 
   @impl true
