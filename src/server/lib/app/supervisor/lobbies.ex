@@ -8,9 +8,9 @@ defmodule App.Supervisor.Lobbies do
   def start_lobby(lobby) do
     case DynamicSupervisor.start_child(__MODULE__, {Lobby, lobby}) do
       {:ok, _pid} ->
-        {:ok, lobby.id}
+        {:ok, "l#{lobby.id}"}
       {:error, {:already_started, _pid}} ->
-        {:ok, lobby.id}
+        {:ok, "l#{lobby.id}"}
     end
   end
 

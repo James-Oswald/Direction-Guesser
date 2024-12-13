@@ -1,23 +1,53 @@
 defmodule App.User do
+  alias App.DB
+
   require Logger
 
   # @private [:password, :__struct__, :__meta__]
  # ---
+  defp lobby_create(user) do
+    Logger.info("(#{user.id}): creating lobby")
+    with lobby
+            <- %App.Lobby.Schema{} |> DB.insert!(),
+         {:ok, {:global, lobby_id}}
+            <- App.Supervisor.Lobbies.start_lobby(lobby) do
+      Logger.info("(u#{user.id}): created lobby (#{lobby_id})")
+      lobby_id
+    end
+  end
+
+  defp lobby_join(user, lobby_id) do
+    Logger.info("(u#{user.id}): joining lobby (#{lobby_id})")
+    GenServer.call({:global, lobby_id}, {:join, Kernel.self()})
+  end
+ # ---
   use GenServer
 
   def start_link(user) do
-    GenServer.start_link(__MODULE__, user, name: {:global, user.id})
+    GenServer.start_link(__MODULE__, user, name: {:global, "u#{user.id}"})
   end
 
   def stop(reason, user) do
-    Logger.info("(#{user.id}): logged out (#{reason})")
+    Logger.info("(u#{user.id}): logged out (#{reason})")
     {:ok, user}
   end
 
   @impl true
   def init(user) do
-    Logger.info("(#{user.id}): logged in")
+    Logger.info("(u#{user.id}): logged in")
     {:ok, user}
+  end
+
+  @impl true
+  def handle_call({:lobby_create, _}, _from, state) do
+    Logger.info("(u#{state.id}): creating lobby")
+    {:reply, lobby_create(state), state}
+  end
+
+  @impl true
+  def handle_call({:lobby_join, %{id: id}}, _from, state) do
+    Logger.info("(u#{state.id}): joining lobby #{id}")
+    {:reply, lobby_join(state, id), state}
   end
  # ---
 end
