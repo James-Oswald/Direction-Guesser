@@ -7,6 +7,9 @@ defmodule App.User.Schema do
     field :username, :string
     field :password, :string
     field :email, :string
+    # --- optional demographics ---
+    field :age, :integer
+    field :gender, :string
   end
  # ---
   def changeset(user, attrs) do
