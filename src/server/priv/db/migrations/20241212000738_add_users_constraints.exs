@@ -1,4 +1,4 @@
-defmodule App.DB.Migrations.CreateUsersConstraints do
+defmodule App.DB.Migrations.AddUsersConstraints do
   use Ecto.Migration
 
   def change do
