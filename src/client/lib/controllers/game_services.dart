@@ -6,9 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class GameServices {
 
-  String serverUrl = 'http://localhost:8080';
+  //String serverUrl = 'http://localhost:8080';
   //String serverUrl = 'http://10.0.2.2:8080';
-  //String serverUrl = 'http://dirg.ieeeualbany.org';
+  String serverUrl = 'http://dirg.ieeeualbany.org';
 
   Future<String> randomCity(double latitude, double longitude) async {
     final url = Uri.parse('$serverUrl/api/process');

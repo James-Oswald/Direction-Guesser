@@ -25,6 +25,10 @@ class _ScorePageState extends State<ScorePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       score = prefs.getString('score');
+      scores['score${roundNumber}'] = {
+        'city': widget.city,
+        'score': score ?? '0'
+      };
     });
   }
 

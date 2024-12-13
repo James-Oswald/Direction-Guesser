@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UsersServices {
 
-  String serverUrl = 'http://localhost:8080'; //localhost
+  //String serverUrl = 'http://localhost:8080'; //localhost
   //String serverUrl = 'http://10.0.2.2:8080'; //Android emulator
-  //String serverUrl = 'http://dirg.ieeeualbany.org'; //Server
+  String serverUrl = 'http://dirg.ieeeualbany.org'; //Server
 
   Future<bool> loginUser(String username, String password) async {
     final url = Uri.parse('$serverUrl/api/auth/');

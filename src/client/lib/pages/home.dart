@@ -1,6 +1,8 @@
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:direction_guesser/widgets/points_pill.dart';
+import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/text_entry_pill.dart';
 
@@ -18,6 +20,16 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
   String roomCode = "";
   int playersInRoom = 0;
+
+  void _logout() async {
+    bool success = await context.read<UsersServices>().logoutUser();
+    if (success) {
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to logout, please try again later.")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
