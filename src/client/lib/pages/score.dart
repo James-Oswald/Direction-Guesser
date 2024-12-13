@@ -14,17 +14,20 @@ class ScorePage extends StatefulWidget {
 class _ScorePageState extends State<ScorePage> {
 
   String? score;
+  String? deg_off;
 
   @override
   void initState() {
     super.initState();
     _getScore();
+    setState(() {});
   }
 
   void _getScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       score = prefs.getString('score');
+      deg_off = prefs.getString('deg_off');
       scores['score${roundNumber}'] = {
         'city': widget.city,
         'score': score ?? '0'
@@ -81,7 +84,7 @@ class _ScorePageState extends State<ScorePage> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 16),
-                  Text("XX.XX° off",
+                  Text(deg_off ?? "XX.XX° off",
                       style: TextStyle(
                           fontStyle: Theme.of(context)
                               .textTheme

@@ -1,6 +1,8 @@
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:direction_guesser/widgets/points_pill.dart';
 import 'package:direction_guesser/controllers/user_services.dart';
+import 'package:direction_guesser/controllers/game_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +31,27 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Failed to logout, please try again later.")));
     }
+  }
+
+  void _getPlayersInRoom() async {
+
+  }
+
+  void _createLobby() async {
+    bool success = await context.read<GameServices>().createLobby();
+    if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      roomCode = prefs.getString('currentLobby') ?? "";
+      roomState.value = RoomState.owner;
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to create room, please try again later.")));
+    }
+  }
+
+  void _joinRoom() async {
+
   }
 
   @override
@@ -97,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                   FilledButton(
                       onPressed: () {
                         // TODO: create room
-                        roomState.value = RoomState.owner;
+                        _createLobby();
                         roomCode = roomCodeController.text;
                       },
                       child: Text("Create Room")),

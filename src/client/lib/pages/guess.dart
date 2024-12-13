@@ -316,7 +316,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     // but it should go in the if (guessSentSuccessfully) {}
     // navigate to the score page
 
-    Navigator.pushNamed(context, '/score', arguments: city);
+    //Navigator.pushNamed(context, '/score', arguments: city);
 
     final prefs = await SharedPreferences.getInstance();
     bool guessSentSuccessfully = false;
@@ -333,6 +333,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     // Check the result of sending the guess
     if (guessSentSuccessfully) {
       // Show success message
+      Navigator.pushNamed(context, '/score', arguments: city);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -438,6 +439,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     targetLatitude = cities[0]['latitude'];
     targetLongitude = cities[0]['longitude'];
     cities.removeAt(0);
+    setState(() {});
   }
 
   @override
