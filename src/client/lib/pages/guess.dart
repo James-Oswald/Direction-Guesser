@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
-
 import 'package:camera/camera.dart';
 import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:flutter/material.dart';
@@ -42,10 +40,11 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   List<double> headings = [];
   bool collectingHeadings = false;
   bool tryAgain = false;
-
-  // TODO: this should be queried from the back end
-  // and NOT queried on every rebuild, only once
-  String city = "Bethlehem Central Middle School";
+  double targetLatitude = 0.0;
+  double targetLongitude = 0.0;
+  bool newGame = true;
+  List<Map<String, dynamic>> cities = [];
+  String targetCity = "";
 
   @override
   void initState() {
@@ -69,30 +68,44 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ValueListenableBuilder<PermissionsState>(
-            valueListenable: permissionState,
-            builder: (_, PermissionsState permissions, child) {
-              if (permissions == PermissionsState.gpsServicesUnavailable) {
-                return MissingDeviceCard(
-                    mainText: "Your device is missing either GPS or a compass.",
-                    subText: "Without these, you are unable to play.");
-              } else if (permissions == PermissionsState.cameraUnavailable) {
-                return MissingDeviceCard(
-                    mainText: "Your device is missing a suitable camera.",
-                    subText: "Without this, you are unable to play.");
-              } else if (permissions == PermissionsState.cameraDenied) {
-                return needCameraUI();
-              } else if (permissions == PermissionsState.locationDenied ||
-                  permissions == PermissionsState.bothDenied) {
-                return needLocationsUI();
-              } else {
-                return guessUI();
-              }
-            }));
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+            body: ValueListenableBuilder<PermissionsState>(
+                valueListenable: permissionState,
+                builder: (_, PermissionsState permissions, child) {
+                  if (permissions == PermissionsState.gpsServicesUnavailable) {
+                    return MissingDeviceCard(
+                        mainText:
+                            "Your device is missing either GPS or a compass.",
+                        subText: "Without these, you are unable to play.");
+                  } else if (permissions ==
+                      PermissionsState.cameraUnavailable) {
+                    return MissingDeviceCard(
+                        mainText: "Your device is missing a suitable camera.",
+                        subText: "Without this, you are unable to play.");
+                  } else if (permissions == PermissionsState.cameraDenied) {
+                    return needCameraUI();
+                  } else if (permissions == PermissionsState.locationDenied ||
+                      permissions == PermissionsState.bothDenied) {
+                    return needLocationsUI();
+                  } else {
+                    return guessUI();
+                  }
+                })));
   }
 
   Container guessUI() {
+    TextStyle largeStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
+    TextStyle mediumStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
     return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -112,32 +125,19 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
             body: Center(
                 child: Column(mainAxisSize: MainAxisSize.max, children: [
               Spacer(),
-              Text("Point to...",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleLarge?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
-              Text(city,
-                  // TODO: this should come from the backend
+              Text("Point to...", style: largeStyle),
+              Text(targetCity,
                   style: TextStyle(
                       fontStyle:
                           Theme.of(context).textTheme.displayMedium?.fontStyle,
                       fontSize: 32,
                       color: Theme.of(context).colorScheme.error)),
               Spacer(),
-              Text("Line up your guess using the camera as a guide.",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "Line up your guess using\nthe camera as a guide.",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 16),
               SizedBox(height: 16),
               HoldTimeoutDetector(
@@ -146,7 +146,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                     if (tryAgain) {
                       tryAgain = false;
                     } else {
-                      submitGuess(context, city);
+                      submitGuess(context, targetCity);
                     }
                   },
                   onTimerInitiated: () {
@@ -218,15 +218,11 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                                             color: Colors.red, thickness: 2))),
                               ])))),
               SizedBox(height: 16),
-              Text("Press and hold to submit your guess!",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
+              Text(
+                "Press and hold to submit your guess!",
+                style: mediumStyle,
+                textAlign: TextAlign.center,
+              ),
               Spacer()
             ]))));
   }
@@ -293,7 +289,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
         headings.add((direction?.heading)!);
       });
       if (headings.any((it) {
-            return (it - direction!.heading!).abs() > 15;
+            return (it - direction!.heading!).abs() > 20;
           }) &&
           context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -329,8 +325,8 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
           headings,
           latitude,
           longitude,
-          42.6204,
-          -73.8257
+          targetLatitude,
+          targetLongitude
           );
     }
 
@@ -426,6 +422,22 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
       // made it through every check, permissions are good
       permissionState.value = PermissionsState.okay;
     });
+
+    //Get the list of cities
+    if (newGame) {
+      var location = await Geolocator.getCurrentPosition();
+      //String city = await context.read<GameServices>().randomCity(location.latitude, location.longitude);
+      cities = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 5);
+      newGame = false;
+      if (cities.isEmpty) {
+        permissionState.value = PermissionsState.gpsServicesUnavailable;
+        return;
+      }
+    }
+    targetCity = cities[0]['name'];
+    targetLatitude = cities[0]['latitude'];
+    targetLongitude = cities[0]['longitude'];
+    cities.removeAt(0);
   }
 
   @override

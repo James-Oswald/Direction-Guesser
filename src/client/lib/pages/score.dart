@@ -1,4 +1,6 @@
+import 'package:direction_guesser/main.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({required this.city}) : super();
@@ -10,93 +12,119 @@ class ScorePage extends StatefulWidget {
 }
 
 class _ScorePageState extends State<ScorePage> {
+
+  String? score;
+
   @override
   void initState() {
     super.initState();
+    _getScore();
+  }
+
+  void _getScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      score = prefs.getString('score');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Theme.of(context).brightness == Brightness.light
-                    ? Color(0xFFFAF8FF)
-                    : Color(0xFF121318),
-                Theme.of(context).brightness == Brightness.light
-                    ? Color(0xFF495D92)
-                    : Color(0xFF151B2C)
-              ]),
-        ),
-        child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-                child: Column(mainAxisSize: MainAxisSize.max, children: [
-              Spacer(),
-              Text("Your guess for",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleLarge?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
-              Text(widget.city,
-                  // TODO: this should come from the backend
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.displayMedium?.fontStyle,
-                      fontSize: 32,
-                      color: Theme.of(context).colorScheme.error)),
-              SizedBox(height: 16),
-              Text("was",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.titleMedium?.fontStyle,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceTint)),
-              SizedBox(height: 16),
-              Text("25.55° off",
-                  style: TextStyle(
-                      fontStyle:
-                          Theme.of(context).textTheme.displayMedium?.fontStyle,
-                      fontSize: 32,
-                      color: Theme.of(context).colorScheme.error)),
-              Spacer(),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text("87",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .displayMedium
-                                ?.fontStyle,
-                            fontSize: 128,
-                            color: Theme.of(context).colorScheme.tertiary)),
-                    Text("points",
-                        style: TextStyle(
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .displayMedium
-                                ?.fontStyle,
-                            fontSize: 32,
-                            color: Theme.of(context).colorScheme.tertiary))
+    TextStyle mediumStyle = TextStyle(
+        fontStyle: Theme.of(context).textTheme.titleLarge?.fontStyle,
+        fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+        color: Theme.of(context).colorScheme.onSurface);
+
+    return PopScope(
+        canPop: false,
+        child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context).brightness == Brightness.light
+                        ? Color(0xFFFAF8FF)
+                        : Color(0xFF121318),
+                    Theme.of(context).brightness == Brightness.light
+                        ? Color(0xFF495D92)
+                        : Color(0xFF151B2C)
                   ]),
-              SizedBox(height: 16),
-              FilledButton(
-                  onPressed: () => Navigator.pushNamed(context, '/home'),
-                  child: Text("Continue")),
-              Spacer()
-            ]))));
+            ),
+            child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: Center(
+                    child: Column(mainAxisSize: MainAxisSize.max, children: [
+                  Spacer(),
+                  Text(
+                    "Your guess for",
+                    style: mediumStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(widget.city,
+                      // TODO: this should come from the backend
+                      style: TextStyle(
+                          fontStyle: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.fontStyle,
+                          fontSize: 32,
+                          color: Theme.of(context).colorScheme.error)),
+                  SizedBox(height: 16),
+                  Text(
+                    "was",
+                    style: mediumStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  Text("XX.XX° off",
+                      style: TextStyle(
+                          fontStyle: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.fontStyle,
+                          fontSize: 32,
+                          color: Theme.of(context).colorScheme.error)),
+                  Spacer(),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(score ?? "0",
+                            style: TextStyle(
+                                fontStyle: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.fontStyle,
+                                fontSize: 128,
+                                color: Theme.of(context).colorScheme.tertiary)),
+                        Text("points",
+                            style: TextStyle(
+                                fontStyle: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.fontStyle,
+                                fontSize: 32,
+                                color: Theme.of(context).colorScheme.tertiary))
+                      ]),
+                  SizedBox(height: 16),
+                  FilledButton(
+                      onPressed: () {
+                        if (roundNumber >= 2) {
+                          roundNumber = 0;
+                          Navigator.pushNamed(context, '/results');
+                        } else {
+                          roundNumber++;
+                          Navigator.pushNamed(context, '/guess');
+                        }
+                      },
+                      child: Icon(
+                        Icons.arrow_forward_rounded,
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      )),
+                  Spacer()
+                ])))));
   }
 }
