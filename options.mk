@@ -16,8 +16,8 @@ BUILD_DIR=	$(GIT_TOP_DIR)/.build
 #
 # COMPILER DEFINITION
 #
-RUSTC=		cargo install --path .
-RUSTC_FLAGS=	--target-dir "$(BUILD_DIR)/" --root "$(BUILD_DIR)/"
+MIXC=	mix
+MIXC_FLAGS=
 
 FLUTTERC=	flutter build
 FLUTTERC_APK=	$(FLUTTERC) apk
@@ -29,9 +29,9 @@ FLUTTERC_CONFIG_FLAGS=	--build-dir=$(BUILD_DIR)
 
 RELEASE ?=	0
 ifeq ($(RELEASE), 1)
-	# CARGO INSTALL DEFAULTS TO A RELEASE PROFILE
+	MIXC_FLAGS +=	MIX_ENV=prod
 	FLUTTERC_FLAGS +=	--release
 else
-	RUSTC_FLAGS +=		--debug
+	MIXC_FLAGS +=	MIX_ENV=dev 
 	FLUTTERC_FLAGS +=	--debug
 endif
