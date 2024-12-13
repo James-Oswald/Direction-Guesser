@@ -12,7 +12,7 @@ defmodule App.Application do
       App.Supervisor.Users,
       App.Auth,
       App.Process,
-      App.Supervisor.Lobby,
+      App.Supervisor.Lobbies,
       AppWeb.Endpoint,
     ]
 
