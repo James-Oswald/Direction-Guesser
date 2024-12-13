@@ -2,7 +2,7 @@ defmodule App.User.Schema do
   use Ecto.Schema
   import Ecto.Changeset
  # ---
-  @derive {Jason.Encoder, only: [:username, :password, :email]}
+  @derive {Jason.Encoder, only: [:username, :password, :email, :age, :gender]}
   schema "users" do
     field :username, :string
     field :password, :string
