@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-enum RoomState { none, owner, joiner }
+enum RoomState { none, wait, owner, joiner }
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController roomCodeController = TextEditingController();
@@ -37,6 +37,32 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  void _lobbyReady() async {
+    roomState.value = RoomState.wait;
+    setState(() {});
+    bool success = await context.read<GameServices>().lobbyReady();
+    if (success) {
+      Navigator.pushNamed(context, '/guess');
+    } else {
+      roomState.value = RoomState.joiner;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to start match, please try again later.")));
+    }
+  }
+
+  void _lobbyReadyOwner() async {
+    roomState.value = RoomState.wait;
+    setState(() {});
+    bool success = await context.read<GameServices>().lobbyReady();
+    if (success) {
+      Navigator.pushNamed(context, '/guess');
+    } else {
+      roomState.value = RoomState.owner;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to start match, please try again later.")));
+    }
+  }
+
   void _createLobby() async {
     bool success = await context.read<GameServices>().createLobby();
     if (success) {
@@ -50,7 +76,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _joinRoom() async {
+  void _joinLobby() async {
+    bool success = await context.read<GameServices>().joinLobby(roomCode);
+    if (success) {
+      roomState.value = RoomState.joiner;
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to join room, please try again later.")));
+    }
 
   }
 
@@ -77,6 +111,8 @@ class _HomePageState extends State<HomePage> {
                 return ownerUI(context);
               } else if (roomState == RoomState.joiner) {
                 return joinerUI(context);
+              } else if (roomState == RoomState.wait) {
+                return waitUI(context);
               } else {
                 return noRoomUI(context);
               }
@@ -122,14 +158,16 @@ class _HomePageState extends State<HomePage> {
                         // TODO: create room
                         _createLobby();
                         roomCode = roomCodeController.text;
+                        setState(() {});
                       },
                       child: Text("Create Room")),
                   SizedBox(width: 16),
                   FilledButton(
                       onPressed: () {
                         // TODO: join room
-                        roomState.value = RoomState.joiner;
+                        _joinLobby();
                         roomCode = roomCodeController.text;
+                        setState(() {});
                       },
                       child: Text("Join Room")),
                 ]),
@@ -207,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                   FilledButton(
                       onPressed: () {
                         // TODO: make all players start the match?
-                        Navigator.pushNamed(context, '/guess');
+                        _lobbyReady();
                       },
                       child: Text("Start Match")),
                 ]),
@@ -248,6 +286,10 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 16)
               ]))
             ])));
+  }
+
+  Widget waitUI(BuildContext) {
+    return Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
   Widget joinerUI(BuildContext context) {

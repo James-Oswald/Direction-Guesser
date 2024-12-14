@@ -6,9 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class GameServices {
 
-  String serverUrl = 'http://localhost:8080';
+  //String serverUrl = 'http://localhost:8080';
   //String serverUrl = 'http://10.0.2.2:8080';
-  //String serverUrl = 'http://dirg.ieeeualbany.org';
+  String serverUrl = 'http://dirg.ieeeualbany.org';
 
   Future<String> randomCity(double latitude, double longitude) async {
     final url = Uri.parse('$serverUrl/api/process');
@@ -128,24 +128,25 @@ class GameServices {
 
     if (response.statusCode == 200) {
       prefs.setString('currentLobby', jsonDecode(response.body).toString());
-      return true;
+      bool success = await joinLobby(jsonDecode(response.body).toString());
+      return success;
     } else {
       return false;
     }
   }
 
   Future<bool> joinLobby(String lobbyName) async {
-    final url = Uri.parse('$serverUrl/api/lobby');
+    final url = Uri.parse('$serverUrl/api/user');
+    final pref = await SharedPreferences.getInstance();
 
     final body = jsonEncode({
-      'join_link': {
-        'name': lobbyName
-      }
+      'lobby_join': {'id': lobbyName}
     });
 
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/JSON'},
+      headers: {'Content-Type': 'application/JSON',
+                'x-auth-token': pref.getString('x-auth-token') ?? ''},
       body: body,
     );
 
@@ -171,15 +172,20 @@ class GameServices {
     return false;
   }
 
-  Future<bool> readyUp() async {
-    final url = Uri.parse('$serverUrl/api/lobby/ready');
+  Future<bool> lobbyReady() async {
+    final url = Uri.parse('$serverUrl/api/user/');
+    final prefs = await SharedPreferences.getInstance();
 
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/JSON'},
+      body: jsonEncode({
+        'lobby_ready': {}
+      }),
     );
 
     if (response.statusCode == 200) {
+      prefs.setString('currentLobbyLocation', response.body);
       return true;
     } else {
       return false;
