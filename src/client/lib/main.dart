@@ -13,6 +13,9 @@ bool soundEnabled = true;
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 int roundNumber = 0;
 Map<String, Map<String, String>> scores = {};
+final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
+
+enum RoomState { none, wait, owner, joiner }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

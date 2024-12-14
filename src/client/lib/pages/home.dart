@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import '../widgets/text_entry_pill.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,11 +16,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-enum RoomState { none, wait, owner, joiner }
-
 class _HomePageState extends State<HomePage> {
   final TextEditingController roomCodeController = TextEditingController();
-  ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
+
   String roomCode = "";
   int playersInRoom = 0;
 
