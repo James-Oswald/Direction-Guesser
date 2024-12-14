@@ -2,6 +2,7 @@ import 'package:direction_guesser/pages/guess.dart';
 import 'package:direction_guesser/pages/home.dart';
 import 'package:direction_guesser/pages/profile.dart';
 import 'package:direction_guesser/pages/results.dart';
+import 'package:direction_guesser/pages/results_multiplayer.dart';
 import 'package:direction_guesser/pages/score.dart';
 import 'package:direction_guesser/pages/settings.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _createRoute(ProfilePage());
     case '/settings':
       return _createRoute(SettingsPage());
+    case '/multiplayer-results':
+      return _createRoute(ResultsMultiplayerPage());
     default:
       return _createRoute(LoginPage());
   }
