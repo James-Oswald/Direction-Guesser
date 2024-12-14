@@ -89,7 +89,7 @@ defmodule App.Lobby do
       DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
 
       if all_users_guessed?(updated_users) do
-        {:reply, {:ok, "Guess submitted"}, %{lobby | users: updated_users}}
+        {:reply, GenServer.call(App.Process, {:calculate_score, guess_data}), %{lobby | users: updated_users}}
       else
         Process.sleep(500)
         GenServer.call(Kernel.self(), {:submit_guess, user_pid})
