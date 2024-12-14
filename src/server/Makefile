@@ -18,7 +18,7 @@ configure:
 server: configure
 	$(MIXC_FLAGS) $(MIXC) compile
 #   MIX IS BUGGY, MIX_BUILD_PATH BREAKS DEPS
-	mkdir -p $(BUILD_DIR)
-	mv _build $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/bin
+	mv _build $(BUILD_DIR)/bin
 
 default: all
