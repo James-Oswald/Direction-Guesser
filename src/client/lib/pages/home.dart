@@ -244,7 +244,7 @@ class _HomePageState extends State<HomePage> {
                   FilledButton(
                       onPressed: () {
                         // TODO: make all players start the match?
-                        _lobbyReady();
+                        _lobbyReadyOwner();
                       },
                       child: Text("Start Match")),
                 ]),
@@ -341,7 +341,9 @@ class _HomePageState extends State<HomePage> {
                           )),
                       FilledButton.tonal(
                           onPressed: () =>
-                              {Navigator.pushNamed(context, '/login')},
+                              {
+                                _lobbyReady()
+                              },
                           // TODO: implement logout
                           child: Icon(
                             Icons.exit_to_app_rounded,

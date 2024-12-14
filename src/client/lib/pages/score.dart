@@ -120,7 +120,11 @@ class _ScorePageState extends State<ScorePage> {
                       onPressed: () {
                         if (roundNumber >= 2) {
                           roundNumber = 0;
-                          Navigator.pushNamed(context, '/results');
+                          if (roomState.value == RoomState.owner || roomState.value == RoomState.joiner) {
+                            Navigator.pushNamed(context, '/multiplayer-results');
+                          } else {
+                            Navigator.pushNamed(context, '/results');
+                          }
                         } else {
                           roundNumber++;
                           Navigator.pushNamed(context, '/guess');

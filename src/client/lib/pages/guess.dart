@@ -321,6 +321,15 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     bool guessSentSuccessfully = false;
     if (context.mounted) {
+      if(roomState.value == RoomState.owner || roomState.value == RoomState.joiner) {
+        guessSentSuccessfully = await context.read<GameServices>().lobbySubmitGuess(
+            headings,
+            latitude,
+            longitude,
+            targetLatitude,
+            targetLongitude
+        );
+      } else {
       guessSentSuccessfully = await context.read<GameServices>().sendGuess(
           headings,
           latitude,
@@ -328,6 +337,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
           targetLatitude,
           targetLongitude
           );
+      }
     }
 
     // Check the result of sending the guess

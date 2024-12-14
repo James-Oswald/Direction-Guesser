@@ -157,6 +157,40 @@ class GameServices {
     }
   }
 
+  Future<bool> lobbySubmitGuess(List<double> user_bearing, double user_lat, double user_lon, double target_lat, double target_lon) async {
+    final url = Uri.parse('$serverUrl/api/user');
+    final prefs = await SharedPreferences.getInstance();
+
+    // TODO BUG: User bearing is an array of bearings, sometimes it is empty. For now, we will sending a fake bearing in its fake
+    double bearing = 0.0;
+    if (user_bearing != null && user_bearing.isNotEmpty) {
+      bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+    }
+    // create the body with all of the information needed for a guess
+    final body = jsonEncode({
+      'lobby_submit': {
+        'user_bearing': bearing,
+        'user_lat': user_lat,
+        'user_lon': user_lon,
+        'target_lat': target_lat,
+        'target_lon': target_lon
+      }
+    });
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/JSON',
+                'x-auth-token': prefs.getString('x-auth-token') ?? ''},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<bool> getLobbyInfo(String lobbyName) async {
     final url = Uri.parse('$serverUrl/api/lobby/$lobbyName');
 
