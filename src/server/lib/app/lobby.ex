@@ -64,12 +64,13 @@ defmodule App.Lobby do
 
   @impl true
   def handle_call({:readyup, user_pid}, _from, lobby) do
+    lobby = Lobby.Schema |> DB.get_by!(%{id: lobby.id})
     if Map.has_key?(lobby.users, user_pid) do
       updated_users = Map.update!(lobby.users, user_pid, &Map.put(&1, :ready, true))
+      DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
 
       if all_users_ready?(updated_users) do
-        DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
-        {:reply, {:ok, GenServer.call(App.Process, {:calculate_nearby, %{user_lat: 42.687, user_lon: -73.824, range: 20}})}, %{lobby | users: updated_users}}
+        {:reply, GenServer.call(App.Process, {:calculate_nearby, %{user_lat: 42.687, user_lon: -73.824, range: 20}}), %{lobby | users: updated_users}}
       else
         Process.sleep(500)
         GenServer.call(Kernel.self(), {:readyup, user_pid})
@@ -81,14 +82,20 @@ defmodule App.Lobby do
 
   @impl true
   def handle_call({:submit_guess, user_pid, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, _from, lobby) do
+    lobby = Lobby.Schema |> DB.get_by!(%{id: lobby.id})
     if Map.has_key?(lobby.users, user_pid) do
       score = GenServer.call(App.Process, {:calculate_score, guess_data})
-
       updated_users = Map.update!(lobby.users, user_pid, &Map.put(&1, :score, score))
       DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
 
+      if all_users_guessed?(updated_users) do
+        {:reply, {:ok, "Guess submitted"}, %{lobby | users: updated_users}}
+      else
+        Process.sleep(500)
+        GenServer.call(Kernel.self(), {:submit_guess, user_pid})
+      end
 
-      {:reply, {:ok, "Guess submitted"}, %{lobby | users: updated_users}}
+
     else
       {:reply, {:error, "User not in this lobby"}, lobby}
     end
@@ -107,4 +114,9 @@ defmodule App.Lobby do
   defp all_users_ready?(users) do
     Enum.all?(users, fn {_pid, %{ready: ready}} -> ready end)
   end
+
+  defp all_users_guessed?(users) do
+    Enum.all?(users, fn {_pid, %{ score: score}} -> score end)
+  end
+
 end
