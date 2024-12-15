@@ -14,6 +14,7 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 int roundNumber = 0;
 Map<String, Map<String, String>> scores = {};
 final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
+List<Map<String, dynamic>> cities = [];
 
 enum RoomState { none, wait, owner, joiner }
 
