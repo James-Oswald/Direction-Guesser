@@ -29,7 +29,7 @@ defmodule App.Lobby do
 
   # FIXME: we should be passing the lobby_id around, not the
   # lobby. this will enforce the fact that we have up to date data.
-  def readyup(lobby, user_pid) do
+  def readyup(lobby, user_pid, user_data = %{user_lat: user_lat, user_lon: user_lon}) do
     lobby =
       Lobby.Schema |> DB.get_by!(%{id: lobby.id})
     if Map.has_key?(lobby.users, user_pid) do
@@ -37,11 +37,11 @@ defmodule App.Lobby do
 	Map.update!(lobby.users, user_pid, &Map.put(&1, :ready, true))
       if all_users_ready?(updated_users) do
 	random_city = 
-	  GenServer.call(App.Process, {:calculate_nearby, %{user_lat: 42.687, user_lon: -73.824, range: 20}})
+	  GenServer.call(App.Process, {:calculate_nearby, %{user_lat: user_lat, user_lon: user_lon, range: 20}})
 	{:ok, random_city}
       else
 	Process.sleep(500)
-	readyup(lobby, user_pid)
+	readyup(lobby, user_pid, user_data)
       end
     else
       {:error, "User not in this lobby"}
@@ -107,8 +107,8 @@ defmodule App.Lobby do
   end
 
   @impl true
-  def handle_call({:readyup, user_pid}, _from, lobby) do
-    {:reply, readyup(lobby, user_pid), lobby}
+  def handle_call({:readyup, user_pid, user_data = %{user_lat: _, user_lon: _}}, _from, lobby) do
+    {:reply, readyup(lobby, user_pid, user_data), lobby}
   end
 
   @impl true
