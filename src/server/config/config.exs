@@ -1,7 +1,7 @@
 import Config
 
 config :app,
-  port: 8080
+  port: 42069
 
 config :app,
   ecto_repos: [App.DB]
