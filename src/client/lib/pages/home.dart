@@ -1,13 +1,24 @@
+import 'dart:async';
+
 import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:direction_guesser/widgets/points_pill.dart';
+import 'package:direction_guesser/widgets/permissions_denied_card.dart';
+import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/controllers/game_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../main.dart';
 import '../widgets/text_entry_pill.dart';
+
+enum PermissionsState {
+  okay,
+  gpsServicesUnavailable,
+  locationDenied
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,9 +29,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController roomCodeController = TextEditingController();
+  ValueNotifier<PermissionsState> permissionState = ValueNotifier(PermissionsState.okay);
 
   String roomCode = "";
   int playersInRoom = 0;
+
+  @override initState() {
+    super.initState();
+    checkSensors();
+  }
 
   void _logout() async {
     bool success = await context.read<UsersServices>().logoutUser();
@@ -32,17 +49,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _getPlayersInRoom() async {
+  void _getLobbyInfo() async {
     final prefs = await SharedPreferences.getInstance();
     String lobbyName = prefs.getString('currentLobby') ?? "";
-    await context.read<GameServices>().getLobbyInfo(lobbyName);
+    await context.read<GameServices>().getLobbyInfo();
     setState(() {});
   }
 
   void _lobbyReady() async {
     roomState.value = RoomState.wait;
     setState(() {});
-    bool success = await context.read<GameServices>().lobbyReady();
+    var location = await Geolocator.getCurrentPosition();
+    bool success = await context.read<GameServices>().lobbyReady(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2));
     if (success) {
       Navigator.pushNamed(context, '/guess');
     } else {
@@ -55,7 +73,8 @@ class _HomePageState extends State<HomePage> {
   void _lobbyReadyOwner() async {
     roomState.value = RoomState.wait;
     setState(() {});
-    bool success = await context.read<GameServices>().lobbyReady();
+    var location = await Geolocator.getCurrentPosition();
+    bool success = await context.read<GameServices>().lobbyReady(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2));
     if (success) {
       Navigator.pushNamed(context, '/guess');
     } else {
@@ -67,7 +86,6 @@ class _HomePageState extends State<HomePage> {
 
   void _createLobby() async {
     bool success = await context.read<GameServices>().createLobby();
-    _getPlayersInRoom();
     if (success) {
       final prefs = await SharedPreferences.getInstance();
       roomCode = prefs.getString('currentLobby') ?? "";
@@ -91,6 +109,25 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  void checkSensors() async{
+    await Geolocator.checkPermission().then((permission) {
+      if (permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.denied) {
+        if (permissionState.value == PermissionsState.okay) {
+          permissionState.value = PermissionsState.locationDenied;
+          return;
+        }
+        return;
+      } else if (permission == LocationPermission.unableToDetermine) {
+        permissionState.value = PermissionsState.gpsServicesUnavailable;
+        return;
+      }
+      // made it through every check, permissions are good
+      permissionState.value = PermissionsState.okay;
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -107,7 +144,30 @@ class _HomePageState extends State<HomePage> {
                     : Color(0xFF151B2C)
               ]),
         ),
-        child: ValueListenableBuilder<RoomState>(
+        child: PopScope(
+          canPop: false,
+          child: ValueListenableBuilder<PermissionsState>(
+            valueListenable: permissionState,
+            builder: (_, PermissionsState permissionState, child) {
+              if (permissionState == PermissionsState.okay) {
+                return mainUI(context);
+              } else if (permissionState == PermissionsState.gpsServicesUnavailable) {
+                return MissingDeviceCard(
+                        mainText:
+                            "Your device is missing either GPS or a compass.",
+                        subText: "Without these, you are unable to play.");;
+              } else if (permissionState == PermissionsState.locationDenied) {
+                return needLocationsUI();
+              } else {
+                return needLocationsUI();
+              }
+            },
+          ),
+        ));
+  }
+
+  Widget mainUI(BuildContext context){
+    return ValueListenableBuilder<RoomState>(
             valueListenable: roomState,
             builder: (_, RoomState roomState, child) {
               if (roomState == RoomState.owner) {
@@ -119,7 +179,7 @@ class _HomePageState extends State<HomePage> {
               } else {
                 return noRoomUI(context);
               }
-            }));
+            });
   }
 
   Widget noRoomUI(BuildContext context) {
@@ -326,6 +386,12 @@ class _HomePageState extends State<HomePage> {
                         roomState.value = RoomState.none;
                       },
                       child: Text("Leave Room")),
+                  FilledButton(
+                      onPressed: () {
+                        // TODO: make all players start the match?
+                        _lobbyReady();
+                      },
+                      child: Text("Ready!")),
                 ]),
                 SizedBox(height: 16),
                 Text("Waiting for match to start...", style: labelStyle),
@@ -368,5 +434,27 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 16)
               ]))
             ])));
+  }
+  Container needLocationsUI() {
+    return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context).brightness == Brightness.light
+                    ? Color(0xFFFAF8FF)
+                    : Color(0xFF121318),
+                Theme.of(context).brightness == Brightness.light
+                    ? Color(0xFF495D92)
+                    : Color(0xFF151B2C)
+              ]),
+        ),
+        child: PermissionsDeniedCard(
+            mainText:
+                "Please enable location permissions for Direction Guesser from your settings",
+            subText:
+                "Location permissions are needed to determine your coordinates and heading.",
+            onPressed: Geolocator.openAppSettings));
   }
 }

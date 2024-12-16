@@ -30,9 +30,8 @@ class GameServices {
   Future<List<Map<String, dynamic>>> getRandomCities(String latitude, String longitude, int amount) async {
     final url = Uri.parse('$serverUrl/api/process');
 
-    //latitude and longitude are reversed in the API
     final body = jsonEncode({
-        'calculate_nearby': {'user_lat': '$longitude', 'user_lon': '$latitude', 'range': 20}
+        'calculate_nearby': {'user_lat': '$latitude', 'user_lon': '$longitude', 'range': 20}
     });
 
     List<Map<String, dynamic>> cities = [];
@@ -195,12 +194,12 @@ class GameServices {
     }
   }
 
-  Future<bool> getLobbyInfo(String lobbyName) async {
+  Future<bool> getLobbyInfo() async {
     final url = Uri.parse('$serverUrl/api/user/');
     final prefs = await SharedPreferences.getInstance();
 
     final body = jsonEncode({
-      'lobby_get': {'id': lobbyName}
+      'lobby_get': {}
     });
 
     final response = await http.post(
@@ -211,24 +210,29 @@ class GameServices {
       body: body,
     );
 
-
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('Lobby data: $data');
+      // TODO: Store the resulting lobby info
     }
     return false;
   }
 
-  Future<bool> lobbyReady() async {
+  Future<bool> lobbyReady(String user_lat, String user_lon) async {
     final url = Uri.parse('$serverUrl/api/user/');
     final prefs = await SharedPreferences.getInstance();
-
+    final sessionId = prefs.getString('x-auth-token');
+    
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/JSON'},
+      headers: {'Content-Type': 'application/JSON',
+                'x-auth-token': sessionId ?? ''
+      },
+
       body: jsonEncode({
-        'lobby_ready': {}
+        'lobby_ready': {
+          'user_lat': user_lat,
+          'user_lon': user_lon
+        }
       }),
     );
 
