@@ -31,7 +31,7 @@ defmodule App.Process do
       SELECT DISTINCT ?placeLabel ?location WHERE {
         SERVICE wikibase:around {
            ?place wdt:P625 ?location .
-           bd:serviceParam wikibase:center "Point(#{user_lat},#{user_lon})"^^geo:wktLiteral   .
+           bd:serviceParam wikibase:center "Point(#{user_lon},#{user_lat})"^^geo:wktLiteral   .
            bd:serviceParam wikibase:radius "#{range}" .
            bd:serviceParam wikibase:distance ?distance .
         } .
