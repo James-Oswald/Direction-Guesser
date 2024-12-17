@@ -36,6 +36,7 @@ defmodule App.Lobby do
     if Map.has_key?(lobby.users, user_pid) do
       updated_users =
 	Map.update!(lobby.users, user_pid, &Map.put(&1, :ready, true))
+      DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
       if all_users_ready?(updated_users) do
 	random_city = 
 	  GenServer.call(App.Process, {:calculate_nearby, %{user_lat: user_lat, user_lon: user_lon, range: 20}})
