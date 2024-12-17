@@ -1,6 +1,5 @@
 defmodule App.User do
   alias App.DB
-  import Ecto.Query, only: [from: 2]
 
   require Logger
 
