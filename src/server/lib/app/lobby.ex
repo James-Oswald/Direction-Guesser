@@ -66,13 +66,13 @@ defmodule App.Lobby do
       lobby =
 	Lobby.Schema |> DB.get_by!(%{id: lobby.id})
       if Map.has_key?(lobby.users, user_pid) do
+	score =
+	  GenServer.call(App.Process, {:calculate_score, guess_data})
 	updated_users =
 	  Map.update!(lobby.users, user_pid, &Map.put(&1, :score, score))
 	DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
 	
 	if all_users_guessed?(updated_users) do
-	  score =
-	    GenServer.call(App.Process, {:calculate_score, guess_data})
 	  {:ok, score}
 	else
           Process.sleep(500)
