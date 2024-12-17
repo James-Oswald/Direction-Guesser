@@ -3,13 +3,17 @@ defmodule App.Lobby do
   alias App.Lobby
   
   require Logger
- # ---    
+ # ---
+  def user_get({_pid, user_data}, slot_name) when is_map(user_data) do
+    Map.get(user_data, slot_name) || Map.get(user_data, String.to_atom(slot_name))
+  end
+  
   defp all_users_ready?(users) do
-    Enum.all?(users, fn {_pid, %{ready: ready}} -> ready end)
+    Enum.all?(users, fn user -> user_get(user, "ready") end)
   end
 
   defp all_users_guessed?(users) do
-    Enum.all?(users, fn {_pid, %{ score: score}} -> score end)
+    Enum.all?(users, fn user -> user_get(user, "score") end)
   end
  # ---    
   def get_lobby_info(lobby, user_pid) do
