@@ -62,7 +62,6 @@ defmodule App.Lobby do
     end
   end
   
-    @impl true
   def submit_guess(lobby, user_pid, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}) do
       lobby =
 	Lobby.Schema |> DB.get_by!(%{id: lobby.id})
