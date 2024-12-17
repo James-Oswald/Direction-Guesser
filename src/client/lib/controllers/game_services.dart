@@ -30,9 +30,8 @@ class GameServices {
   Future<List<Map<String, dynamic>>> getRandomCities(String latitude, String longitude, int amount) async {
     final url = Uri.parse('$serverUrl/api/process');
 
-    //latitude and longitude are reversed in the API
     final body = jsonEncode({
-        'calculate_nearby': {'user_lat': '$longitude', 'user_lon': '$latitude', 'range': 20}
+        'calculate_nearby': {'user_lat': '$latitude', 'user_lon': '$longitude', 'range': 20}
     });
 
     List<Map<String, dynamic>> cities = [];
@@ -63,14 +62,16 @@ class GameServices {
     // TODO: we haven't decided on an endpoint for this yet
     final url = Uri.parse('$serverUrl/api/process');
     // TODO BUG: User bearing is an array of bearings, sometimes it is empty. For now, we will sending a fake bearing in its fake
-    double bearing = 0.0;
+    double avg_bearing;
     if (user_bearing != null && user_bearing.isNotEmpty) {
-      bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+      avg_bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+    } else {
+      return false;
     }
     // create the body with all of the information needed for a guess
     final body = jsonEncode({
       'calculate_score': {
-        'user_bearing': bearing,
+        'user_bearing': avg_bearing,
         'user_lat': user_lat,
         'user_lon': user_lon,
         'target_lat': target_lat,
@@ -162,14 +163,16 @@ class GameServices {
     final prefs = await SharedPreferences.getInstance();
 
     // TODO BUG: User bearing is an array of bearings, sometimes it is empty. For now, we will sending a fake bearing in its fake
-    double bearing = 0.0;
+    double avg_bearing;
     if (user_bearing != null && user_bearing.isNotEmpty) {
-      bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+      avg_bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+    } else {
+      return false;
     }
     // create the body with all of the information needed for a guess
     final body = jsonEncode({
       'lobby_submit': {
-        'user_bearing': bearing,
+        'user_bearing': avg_bearing,
         'user_lat': user_lat,
         'user_lon': user_lon,
         'target_lat': target_lat,
@@ -191,30 +194,47 @@ class GameServices {
     }
   }
 
-  Future<bool> getLobbyInfo(String lobbyName) async {
-    final url = Uri.parse('$serverUrl/api/lobby/$lobbyName');
+  Future<bool> getLobbyInfo() async {
+    final url = Uri.parse('$serverUrl/api/user/');
+    final prefs = await SharedPreferences.getInstance();
 
-    final response = await http.get(
+    final body = jsonEncode({
+      'lobby_get': {}
+    });
+
+    final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/JSON'},
+      headers: {'Content-Type': 'application/JSON',
+                'x-auth-token': prefs.getString('x-auth-token') ?? ''
+      },
+      body: body,
     );
+
+
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('Lobby data: $data');
+      // TODO: Store the resulting lobby info
     }
     return false;
   }
 
-  Future<bool> lobbyReady() async {
+  Future<bool> lobbyReady(String user_lat, String user_lon) async {
     final url = Uri.parse('$serverUrl/api/user/');
     final prefs = await SharedPreferences.getInstance();
-
+    final sessionId = prefs.getString('x-auth-token');
+    
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/JSON'},
+      headers: {'Content-Type': 'application/JSON',
+                'x-auth-token': sessionId ?? ''
+      },
+
       body: jsonEncode({
-        'lobby_ready': {}
+        'lobby_ready': {
+          'user_lat': user_lat,
+          'user_lon': user_lon
+        }
       }),
     );
 

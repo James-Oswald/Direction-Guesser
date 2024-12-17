@@ -55,6 +55,7 @@ defmodule AppWeb.Router do
     with {:ok, msg}   <- parse_req_msg(conn),
          reply        <- unwrap!(GenServer.call(actor, msg))
     do
+      Logger.debug("(router): #{inspect(msg)}")
      Logger.debug("(router): #{inspect(reply)}")
      conn
      |> put_resp_content_type("application/json")

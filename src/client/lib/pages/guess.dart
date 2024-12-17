@@ -43,7 +43,6 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
   double targetLatitude = 0.0;
   double targetLongitude = 0.0;
   bool newGame = true;
-  List<Map<String, dynamic>> cities = [];
   String targetCity = "";
 
   @override
@@ -92,7 +91,9 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
                   } else {
                     return guessUI();
                   }
-                })));
+                })
+              )
+            );
   }
 
   Container guessUI() {
@@ -435,10 +436,10 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     });
 
     //Get the list of cities
-    if (newGame) {
+    if (roundNumber == 0) {
       var location = await Geolocator.getCurrentPosition();
       //String city = await context.read<GameServices>().randomCity(location.latitude, location.longitude);
-      cities = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 5);
+      cities = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 3);
       newGame = false;
       if (cities.isEmpty) {
         permissionState.value = PermissionsState.gpsServicesUnavailable;
