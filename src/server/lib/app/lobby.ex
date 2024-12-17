@@ -92,7 +92,7 @@ defmodule App.Lobby do
         {:reply, GenServer.call(App.Process, {:calculate_score, guess_data}), %{lobby | users: updated_users}}
       else
         Process.sleep(500)
-        GenServer.call(Kernel.self(), {:submit_guess, user_pid})
+        GenServer.call(Kernel.self(), {:submit_guess, user_pid, guess_data})
       end
 
 
