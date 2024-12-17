@@ -1,5 +1,6 @@
 defmodule App.Lobby do
   alias App.DB
+  alias App.Lobby
   
   require Logger
  # ---    
