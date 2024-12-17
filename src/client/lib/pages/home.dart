@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
 
   void _createLobby() async {
     bool success = await context.read<GameServices>().createLobby();
-    _getPlayersInRoom();
+    _getLobbyInfo();
     if (success) {
       final prefs = await SharedPreferences.getInstance();
       roomCode = prefs.getString('currentLobby') ?? "";
