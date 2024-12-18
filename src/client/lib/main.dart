@@ -19,6 +19,7 @@ bool soundEnabled = true;
 enum RoomState { none, wait, owner, joiner }
 final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
 
+//TODO: Refactor app to use User Model
 User currentUser = User();
 Game currentGame = Game(lobbyId: '', totalRounds: 1, timeLimit: 60);
 bool isMultiplayer = false;

@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
       final prefs = await SharedPreferences.getInstance();
       currentGame.lobbyId = prefs.getString('currentLobby') ?? "";
       roomCode = currentGame.lobbyId;
+      currentGame.isMultiplayer = true;
       roomState.value = RoomState.owner;
       setState(() {});
     } else {
@@ -122,6 +123,7 @@ class _HomePageState extends State<HomePage> {
     bool success = await context.read<GameServices>().joinLobby(roomCode);
     if (success) {
       currentGame.lobbyId = roomCode;
+      currentGame.isMultiplayer = true;
       roomState.value = RoomState.joiner;
       setState(() {});
     } else {
@@ -193,23 +195,6 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: double.infinity,
-                height: 2,
-                color: const Color.fromARGB(255, 255, 0, 0),
-              ),
-            ),
-            // Vertical line through the center
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: 2,
-                height: double.infinity,
-                color: const Color.fromARGB(255, 255, 0, 0),
-              ),
-            ),
             SafeArea(
                 child: FlutterEarthGlobe(
               controller: globeController,
@@ -364,7 +349,7 @@ class _HomePageState extends State<HomePage> {
       Text("Players in room: $playersInRoom", style: labelStyle),
       SizedBox(height: 16),
       Container(
-        width: MediaQuery.of(context).size.width * 0.6,
+        width: MediaQuery.of(context).size.width * 0.8,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Expanded(
             flex: 1,
@@ -372,6 +357,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   // TODO: destroy room
                   roomState.value = RoomState.none;
+                  currentGame.clear();
                 },
                 child: Center(child: Text("Destroy Room"))),
           ),
@@ -414,6 +400,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // TODO: destroy room
                       roomState.value = RoomState.none;
+                      currentGame.clear();
                     },
                     child: Text("Leave Room")),
               ),
