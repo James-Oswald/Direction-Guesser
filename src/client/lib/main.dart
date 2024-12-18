@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:direction_guesser/controllers/game_services.dart';
 import 'package:direction_guesser/controllers/user_services.dart';
+import 'package:direction_guesser/models/game.dart';
+import 'package:direction_guesser/models/user.dart'; 
 import 'package:direction_guesser/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,15 +10,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'routes.dart';
 
+// Global variables
+// These are used to store the theme, cameras, sound settings, room state of lobby ui, user, and game objects
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 List<CameraDescription> cameras = [];
 bool soundEnabled = true;
-final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
-int roundNumber = 0;
-Map<String, Map<String, String>> scores = {};
-final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
-List<Map<String, dynamic>> cities = [];
 
 enum RoomState { none, wait, owner, joiner }
+final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
+
+User currentUser = User();
+Game currentGame = Game(lobbyId: '', totalRounds: 1, timeLimit: 60);
+bool isMultiplayer = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +59,6 @@ class MainApp extends StatelessWidget {
   }
 }
 
-
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -70,11 +74,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkSessionStatus() async {
     await Future.delayed(Duration(seconds: 2)); // Optional delay for better UX
     final prefs = await SharedPreferences.getInstance();
-    var sessionId = prefs.getString('x-auth-token');
+    String? sessionId = prefs.getString('x-auth-token');
 
     if (sessionId != null) {
+      currentUser = User(username: prefs.getString('username'), sessionId: prefs.getString('sessionId'));
       Navigator.pushReplacementNamed(context, '/home');
     } else {
+      currentUser.clear();
       Navigator.pushReplacementNamed(context, '/login');
     }
   }

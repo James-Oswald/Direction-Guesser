@@ -9,6 +9,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
+  Map<String, Map<String, String>> scores = currentGame.scores;
   @override
   void initState() {
     super.initState();
@@ -77,6 +78,8 @@ class _ResultsPageState extends State<ResultsPage> {
                   Spacer(),
                   FilledButton(
                       onPressed: () {
+                        currentGame.clear();
+                        roomState.value = RoomState.none;
                         Navigator.pushNamed(context, '/home');
                       },
                       child: Icon(

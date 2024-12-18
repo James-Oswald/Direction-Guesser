@@ -219,10 +219,11 @@ class GameServices {
     return false;
   }
 
-  Future<bool> lobbyReady(String user_lat, String user_lon) async {
+  Future<List<Map<String, dynamic>>> lobbyReady(String user_lat, String user_lon) async {
     final url = Uri.parse('$serverUrl/api/user/');
     final prefs = await SharedPreferences.getInstance();
     final sessionId = prefs.getString('x-auth-token');
+    List<Map<String, dynamic>> cities = [];
     
     final response = await http.post(
       url,
@@ -239,10 +240,18 @@ class GameServices {
     );
 
     if (response.statusCode == 200) {
-      prefs.setString('currentLobbyLocation', response.body);
-      return true;
-    } else {
-      return false;
-    }
+      final data = jsonDecode(response.body);
+
+      String name= data[0][1]; // Name
+      dynamic longitude= data[1][1][0]; // Longitude
+      dynamic latitude= data[1][1][1];
+      
+      cities.add({
+          "name": name, // Name
+          "longitude": longitude, // Longitude
+          "latitude": latitude // Latitude
+        });
+    } 
+    return cities;
   }
 }
