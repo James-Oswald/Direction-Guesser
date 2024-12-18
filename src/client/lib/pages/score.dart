@@ -118,6 +118,7 @@ class _ScorePageState extends State<ScorePage> {
                   SizedBox(height: 16),
                   FilledButton(
                       onPressed: () {
+                        currentGame.incrementRound();
                         if (currentGame.roundNumber >= currentGame.totalRounds) {
                           if (currentGame.isMultiplayer) {
                             Navigator.pushNamed(context, '/multiplayer-results');
@@ -125,7 +126,6 @@ class _ScorePageState extends State<ScorePage> {
                             Navigator.pushNamed(context, '/results');
                           }
                         } else {
-                          currentGame.incrementRound();
                           Navigator.pushNamed(context, '/guess');
                         }
                       },

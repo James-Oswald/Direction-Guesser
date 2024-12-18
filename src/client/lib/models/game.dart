@@ -46,5 +46,6 @@ class Game{
     playerStatus.clear();
     citiesList.clear();
     roundNumber = 0;
+    isMultiplayer = false;
   }
 }

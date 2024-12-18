@@ -322,7 +322,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     bool guessSentSuccessfully = false;
     if (context.mounted) {
-      if(roomState.value == RoomState.owner || roomState.value == RoomState.joiner) {
+      if(currentGame.isMultiplayer) {
         guessSentSuccessfully = await context.read<GameServices>().lobbySubmitGuess(
             headings,
             latitude,
@@ -435,6 +435,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
       permissionState.value = PermissionsState.okay;
     });
 
+    //TODO: Refactor this to separate function
     //Get the list of cities
     if (isMultiplayer){
       targetCity = currentGame.citiesList[currentGame.roundNumber]['name'];
