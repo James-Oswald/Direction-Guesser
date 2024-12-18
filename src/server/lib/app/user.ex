@@ -23,12 +23,13 @@ defmodule App.User do
 
   defp lobby_ready(user, user_data = %{user_lat: _, user_lon: _}) do
     lobby = lobby_get(user)
-    GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data})
+    Logger.info("(u#{user.id}): #{inspect({:readyup, "u#{user.id}", user_data})}")
+    GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data}, :infinity)
   end
 63
   defp lobby_submit(user, guess_data) do
     lobby = lobby_get(user)
-    GenServer.call({:global, "l#{lobby.id}"}, {:submit, "u#{user.id}", guess_data})
+    GenServer.call({:global, "l#{lobby.id}"}, {:submit_guess, "u#{user.id}", guess_data}, :infinity)
   end
 
   defp lobby_get(user) do

@@ -53,7 +53,7 @@ defmodule AppWeb.Router do
 
   defp resp_actor!(conn, actor) do
     with {:ok, msg}   <- parse_req_msg(conn),
-         reply        <- unwrap!(GenServer.call(actor, msg))
+         reply        <- unwrap!(GenServer.call(actor, msg, :infinity))
     do
       Logger.debug("(router): #{inspect(msg)}")
      Logger.debug("(router): #{inspect(reply)}")

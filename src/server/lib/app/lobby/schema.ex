@@ -6,6 +6,7 @@ defmodule App.Lobby.Schema do
     field :target_guess_range,  :integer, default: 20
     field :time_per_round,      :integer, default: 15
     field :number_of_rounds,    :integer, default: 1
+    field :location,            :string
 
     field :users,       :map,           default: %{}
     field :round_data,  {:array, :map}, default: []
