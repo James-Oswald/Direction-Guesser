@@ -32,6 +32,8 @@ class UsersServices {
       // Store the session ID temporarily using shared preferences library in the future will move to user model
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('x-auth-token', sessionId);
+      await prefs.setString('username', username);
+      await prefs.setString('password', password);
 
       return true;
     } else {

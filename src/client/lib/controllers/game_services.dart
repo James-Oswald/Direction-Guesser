@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:math' as Math;
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,7 +65,7 @@ class GameServices {
     // TODO BUG: User bearing is an array of bearings, sometimes it is empty. For now, we will sending a fake bearing in its fake
     double avg_bearing;
     if (user_bearing != null && user_bearing.isNotEmpty) {
-      avg_bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+      avg_bearing = user_bearing.reduce((a, b) => a.abs() + b.abs()) / user_bearing.length;
     } else {
       return false;
     }
@@ -165,7 +166,7 @@ class GameServices {
     // TODO BUG: User bearing is an array of bearings, sometimes it is empty. For now, we will sending a fake bearing in its fake
     double avg_bearing;
     if (user_bearing != null && user_bearing.isNotEmpty) {
-      avg_bearing = user_bearing.reduce((a, b) => a + b) / user_bearing.length;
+      avg_bearing = user_bearing.reduce((a, b) => a.abs() + b.abs()) / user_bearing.length;
     } else {
       return false;
     }
@@ -185,9 +186,18 @@ class GameServices {
       headers: {'Content-Type': 'application/JSON',
                 'x-auth-token': prefs.getString('x-auth-token') ?? ''},
       body: body,
-    );
+    ).timeout(Duration(seconds: 300));
 
     if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      /* e.g. 93 */
+      final score = data[0][1];
+      /* e.g. degrees off */
+      final deg_off = data[1][1];
+      // Format deg_off to two decimal places and add the degree symbol
+      final formattedDegOff = "${deg_off.toStringAsFixed(2)}°";
+      await prefs.setString('score', score.toString());
+      await prefs.setString('deg_off', formattedDegOff);
       return true;
     } else {
       return false;
@@ -237,10 +247,10 @@ class GameServices {
           'user_lon': user_lon
         }
       }),
-    );
+    ).timeout(Duration(seconds: 300));
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(jsonDecode(response.body));
 
       String name= data[0][1]; // Name
       dynamic longitude= data[1][1][0]; // Longitude

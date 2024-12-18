@@ -285,6 +285,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           FilledButton(
               onPressed: () {
+                currentGame.isMultiplayer = false;
                 Navigator.pushNamed(context, '/guess');
               },
               child: Text("Single Player Match")),
@@ -357,6 +358,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   // TODO: destroy room
                   roomState.value = RoomState.none;
+                  currentGame.isMultiplayer = false;
                   currentGame.clear();
                 },
                 child: Center(child: Text("Destroy Room"))),
@@ -400,6 +402,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // TODO: destroy room
                       roomState.value = RoomState.none;
+                      currentGame.isMultiplayer = false;
                       currentGame.clear();
                     },
                     child: Text("Leave Room")),

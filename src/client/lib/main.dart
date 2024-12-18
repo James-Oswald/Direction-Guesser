@@ -22,7 +22,6 @@ final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
 //TODO: Refactor app to use User Model
 User currentUser = User();
 Game currentGame = Game(lobbyId: '', totalRounds: 1, timeLimit: 60);
-bool isMultiplayer = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (sessionId != null) {
       currentUser = User(username: prefs.getString('username'), sessionId: prefs.getString('sessionId'));
+      context.read<UsersServices>().loginUser(currentUser.username??'', prefs.getString('password')??'');
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       currentUser.clear();

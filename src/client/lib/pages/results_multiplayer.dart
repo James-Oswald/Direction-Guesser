@@ -1,5 +1,6 @@
 import 'package:direction_guesser/main.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 
 class ResultsMultiplayerPage extends StatefulWidget {
   const ResultsMultiplayerPage() : super();
@@ -13,6 +14,7 @@ class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
   @override
   void initState() {
     super.initState();
+    currentGame.clear();
   }
 
   @override
