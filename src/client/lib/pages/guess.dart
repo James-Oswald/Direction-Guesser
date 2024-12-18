@@ -437,7 +437,7 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
 
     //TODO: Refactor this to separate function
     //Get the list of cities
-    if (isMultiplayer){
+    if (currentGame.isMultiplayer) {
       targetCity = currentGame.citiesList[currentGame.roundNumber]['name'];
       targetLatitude = currentGame.citiesList[currentGame.roundNumber]['latitude'];
       targetLongitude = currentGame.citiesList[currentGame.roundNumber]['longitude'];
