@@ -25,7 +25,7 @@ defmodule App.User do
     lobby = lobby_get(user)
     GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data})
   end
-
+63
   defp lobby_submit(user, guess_data) do
     lobby = lobby_get(user)
     GenServer.call({:global, "l#{lobby.id}"}, {:submit, "u#{user.id}", guess_data})
@@ -72,7 +72,7 @@ defmodule App.User do
 
   @impl true
   def handle_call({:lobby_submit, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, _from, state) do
-    Logger.info("(u#{state.id}): submitting guess #{guess_data}")
+    Logger.info("(u#{state.id}): submitting guess #{inspect(guess_data)}")
     {:reply, lobby_submit(state, guess_data), state}
   end
 
