@@ -10,15 +10,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_earth_globe/flutter_earth_globe.dart';
+import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
 
 import '../main.dart';
 import '../widgets/text_entry_pill.dart';
 
-enum PermissionsState {
-  okay,
-  gpsServicesUnavailable,
-  locationDenied
-}
+enum PermissionsState { okay, gpsServicesUnavailable, locationDenied }
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,13 +27,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController roomCodeController = TextEditingController();
-  ValueNotifier<PermissionsState> permissionState = ValueNotifier(PermissionsState.okay);
+  ValueNotifier<PermissionsState> permissionState =
+      ValueNotifier(PermissionsState.okay);
+  late AppLifecycleListener lifecycleListener;
+  late FlutterEarthGlobeController globeController =
+      FlutterEarthGlobeController(
+          isRotating: true,
+          rotationSpeed: 0.05,
+          surface: Image.asset('assets/2k_earth-night.jpg').image);
 
   String roomCode = "";
   int playersInRoom = 0;
 
-  @override initState() {
+  @override
+  initState() {
     super.initState();
+    globeController = FlutterEarthGlobeController(
+        isRotating: true,
+        rotationSpeed: 0.05,
+        surface: Image.asset('assets/2k_earth-night.jpg').image);
+    lifecycleListener = AppLifecycleListener(onRestart: checkSensors);
     checkSensors();
   }
 
@@ -44,8 +55,8 @@ class _HomePageState extends State<HomePage> {
     if (success) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Failed to logout, please try again later.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to logout, please try again later.")));
     }
   }
 
@@ -60,13 +71,17 @@ class _HomePageState extends State<HomePage> {
     roomState.value = RoomState.wait;
     setState(() {});
     var location = await Geolocator.getCurrentPosition();
-    bool success = await context.read<GameServices>().lobbyReady(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2));
-    if (success) {
+    currentGame.citiesList = await context.read<GameServices>().lobbyReady(
+        location.latitude.toStringAsFixed(2),
+        location.longitude.toStringAsFixed(2));
+    if (currentGame.citiesList.isNotEmpty) {
       Navigator.pushNamed(context, '/guess');
     } else {
       roomState.value = RoomState.joiner;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Failed to start match, please try again later.")));
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Failed to start match, please try again later.")));
+      });
     }
   }
 
@@ -74,13 +89,17 @@ class _HomePageState extends State<HomePage> {
     roomState.value = RoomState.wait;
     setState(() {});
     var location = await Geolocator.getCurrentPosition();
-    bool success = await context.read<GameServices>().lobbyReady(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2));
-    if (success) {
+    currentGame.citiesList = await context.read<GameServices>().lobbyReady(
+        location.latitude.toStringAsFixed(2),
+        location.longitude.toStringAsFixed(2));
+    if (currentGame.citiesList.isNotEmpty) {
       Navigator.pushNamed(context, '/guess');
     } else {
       roomState.value = RoomState.owner;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Failed to start match, please try again later.")));
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Failed to start match, please try again later.")));
+      });
     }
   }
 
@@ -89,7 +108,8 @@ class _HomePageState extends State<HomePage> {
     _getLobbyInfo();
     if (success) {
       final prefs = await SharedPreferences.getInstance();
-      roomCode = prefs.getString('currentLobby') ?? "";
+      currentGame.lobbyId = prefs.getString('currentLobby') ?? "";
+      roomCode = currentGame.lobbyId;
       roomState.value = RoomState.owner;
       setState(() {});
     } else {
@@ -101,16 +121,16 @@ class _HomePageState extends State<HomePage> {
   void _joinLobby() async {
     bool success = await context.read<GameServices>().joinLobby(roomCode);
     if (success) {
+      currentGame.lobbyId = roomCode;
       roomState.value = RoomState.joiner;
       setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Failed to join room, please try again later.")));
     }
-
   }
 
-  void checkSensors() async{
+  void checkSensors() async {
     await Geolocator.checkPermission().then((permission) {
       if (permission == LocationPermission.deniedForever ||
           permission == LocationPermission.denied) {
@@ -152,14 +172,15 @@ class _HomePageState extends State<HomePage> {
             builder: (_, PermissionsState permissionState, child) {
               if (permissionState == PermissionsState.okay) {
                 return mainUI(context);
-              } else if (permissionState == PermissionsState.gpsServicesUnavailable) {
+              } else if (permissionState ==
+                  PermissionsState.gpsServicesUnavailable) {
+                checkSensors();
                 return MissingDeviceCard(
-                        mainText:
-                            "Your device is missing either GPS or a compass.",
-                        subText: "Without these, you are unable to play.");;
-              } else if (permissionState == PermissionsState.locationDenied) {
-                return needLocationsUI();
+                    mainText: "Your device is missing either GPS or a compass.",
+                    subText: "Without these, you are unable to play.");
+                ;
               } else {
+                checkSensors();
                 return needLocationsUI();
               }
             },
@@ -167,111 +188,167 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  Widget mainUI(BuildContext context){
-    return ValueListenableBuilder<RoomState>(
-            valueListenable: roomState,
-            builder: (_, RoomState roomState, child) {
-              if (roomState == RoomState.owner) {
-                return ownerUI(context);
-              } else if (roomState == RoomState.joiner) {
-                return joinerUI(context);
-              } else if (roomState == RoomState.wait) {
-                return waitUI(context);
-              } else {
-                return noRoomUI(context);
-              }
-            });
+  Widget mainUI(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: double.infinity,
+                height: 2,
+                color: const Color.fromARGB(255, 255, 0, 0),
+              ),
+            ),
+            // Vertical line through the center
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: 2,
+                height: double.infinity,
+                color: const Color.fromARGB(255, 255, 0, 0),
+              ),
+            ),
+            SafeArea(
+                child: FlutterEarthGlobe(
+              controller: globeController,
+              radius: 60,
+              //TODO: temporary fix globe is not centered
+              //will need to inspect widget tree to see why
+              alignment: Alignment(0, -0.4),
+            )),
+            Padding(
+                padding: EdgeInsets.all(8),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 64),
+                      PointsPill(points: 15827),
+                      SizedBox(height: 32),
+                      Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                            Spacer(),
+                            Spacer(),
+                            Spacer(),
+                            ValueListenableBuilder<RoomState>(
+                                valueListenable: roomState,
+                                builder: (_, RoomState roomState, child) {
+                                  if (roomState == RoomState.owner) {
+                                    return ownerUI(context);
+                                  } else if (roomState == RoomState.joiner) {
+                                    return joinerUI(context);
+                                  } else if (roomState == RoomState.wait) {
+                                    return waitUI(context);
+                                  } else {
+                                    return noRoomUI(context);
+                                  }
+                                }),
+                            Spacer(),
+                            Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  FilledButton.tonal(
+                                      onPressed: () => {
+                                            Navigator.pushNamed(
+                                                context, '/settings')
+                                          },
+                                      child: Icon(
+                                        Icons.settings_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      )),
+                                  FilledButton.tonal(
+                                      //untested
+                                      onPressed: () => {_logout()},
+                                      child: Icon(
+                                        Icons.exit_to_app_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      )),
+                                  FilledButton.tonal(
+                                      onPressed: () => {
+                                            Navigator.pushNamed(
+                                                context, '/profile')
+                                          },
+                                      child: Icon(
+                                        Icons.person_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ))
+                                ]),
+                            SizedBox(height: 16)
+                          ]))
+                    ]))
+          ],
+        ));
   }
 
   Widget noRoomUI(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Padding(
-            padding: EdgeInsets.all(8),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              SizedBox(height: 64),
-              PointsPill(points: 15827),
-              SizedBox(height: 32),
-              Expanded(
-                  child: Column(mainAxisSize: MainAxisSize.max, children: [
-                LeaderboardCard(),
-                Spacer(),
-                FilledButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/guess');
-                    },
-                    child: Text("Single Player Match")),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: 64,
-                  child: TextEntryPill(
-                    controller: roomCodeController,
-                    icon: Icon(
-                      Icons.qr_code_2_rounded,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
-                    hintText: "room code",
-                    obscured: false,
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          FilledButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/guess');
+              },
+              child: Text("Single Player Match")),
+          SizedBox(height: 12),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            height: 64,
+            child: TextEntryPill(
+              controller: roomCodeController,
+              icon: Icon(
+                Icons.qr_code_2_rounded,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
+              hintText: "room code",
+              obscured: false,
+            ),
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: FilledButton(
+                        onPressed: () {
+                          // TODO: create room
+                          _createLobby();
+                          roomCode = roomCodeController.text;
+                          setState(() {});
+                        },
+                        child: Text("Create Room")),
                   ),
-                ),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: create room
-                        _createLobby();
-                        roomCode = roomCodeController.text;
-                        setState(() {});
-                      },
-                      child: Text("Create Room")),
                   SizedBox(width: 16),
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: join room
-                        _joinLobby();
-                        roomCode = roomCodeController.text;
-                        setState(() {});
-                      },
-                      child: Text("Join Room")),
+                  Expanded(
+                    flex: 1,
+                    child: FilledButton(
+                        onPressed: () {
+                          // TODO: join room
+                          roomCode = roomCodeController.text;
+                          _joinLobby();
+                          setState(() {});
+                        },
+                        child: Text("Join Room")),
+                  ),
                 ]),
-                Spacer(),
-                Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/settings')},
-                          child: Icon(
-                            Icons.settings_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/login')},
-                          // TODO: implement logout
-                          child: Icon(
-                            Icons.exit_to_app_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/profile')},
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          ))
-                    ]),
-                SizedBox(height: 16)
-              ]))
-            ])));
+          )
+        ]);
   }
 
   Widget ownerUI(BuildContext context) {
@@ -281,79 +358,36 @@ class _HomePageState extends State<HomePage> {
         fontWeight: FontWeight.bold,
         color: Theme.of(context).colorScheme.onSurface);
 
-    return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Padding(
-            padding: EdgeInsets.all(8),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              SizedBox(height: 64),
-              PointsPill(points: 15827),
-              SizedBox(height: 32),
-              Expanded(
-                  child: Column(mainAxisSize: MainAxisSize.max, children: [
-                LeaderboardCard(),
-                Spacer(),
-                Text("Current room: $roomCode", style: labelStyle),
-                SizedBox(height: 8),
-                Text("Players in room: $playersInRoom", style: labelStyle),
-                SizedBox(height: 16),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: destroy room
-                        roomState.value = RoomState.none;
-                      },
-                      child: Text("Destroy Room")),
-                  SizedBox(width: 16),
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: make all players start the match?
-                        _lobbyReadyOwner();
-                      },
-                      child: Text("Start Match")),
-                ]),
-                Spacer(),
-                Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/settings')},
-                          child: Icon(
-                            Icons.settings_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/login')},
-                          // TODO: implement logout
-                          child: Icon(
-                            Icons.exit_to_app_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/profile')},
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          ))
-                    ]),
-                SizedBox(height: 16)
-              ]))
-            ])));
-  }
-
-  Widget waitUI(BuildContext) {
-    return Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Text("Current room: $roomCode", style: labelStyle),
+      SizedBox(height: 8),
+      Text("Players in room: $playersInRoom", style: labelStyle),
+      SizedBox(height: 16),
+      Container(
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Expanded(
+            flex: 1,
+            child: FilledButton(
+                onPressed: () {
+                  // TODO: destroy room
+                  roomState.value = RoomState.none;
+                },
+                child: Center(child: Text("Destroy Room"))),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            flex: 1,
+            child: FilledButton(
+                onPressed: () {
+                  // TODO: make all players start the match?
+                  _lobbyReadyOwner();
+                },
+                child: Center(child: Text("Start Match"))),
+          ),
+        ]),
+      ),
+    ]);
   }
 
   Widget joinerUI(BuildContext context) {
@@ -363,79 +397,47 @@ class _HomePageState extends State<HomePage> {
         fontWeight: FontWeight.bold,
         color: Theme.of(context).colorScheme.onSurface);
 
-    return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Padding(
-            padding: EdgeInsets.all(8),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              SizedBox(height: 64),
-              PointsPill(points: 15827),
-              SizedBox(height: 32),
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text("Current room: $roomCode", style: labelStyle),
+          SizedBox(height: 8),
+          Text("Players in room: $playersInRoom", style: labelStyle),
+          SizedBox(height: 16),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Expanded(
-                  child: Column(mainAxisSize: MainAxisSize.max, children: [
-                LeaderboardCard(),
-                SizedBox(height: 32),
-                Text("Current room: $roomCode", style: labelStyle),
-                SizedBox(height: 8),
-                Text("Players in room: $playersInRoom", style: labelStyle),
-                SizedBox(height: 16),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: destroy room
-                        roomState.value = RoomState.none;
-                      },
-                      child: Text("Leave Room")),
-                  FilledButton(
-                      onPressed: () {
-                        // TODO: make all players start the match?
-                        _lobbyReady();
-                      },
-                      child: Text("Ready!")),
-                ]),
-                SizedBox(height: 16),
-                Text("Waiting for match to start...", style: labelStyle),
-                Spacer(),
-                Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/settings')},
-                          child: Icon(
-                            Icons.settings_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {
-                                _lobbyReady()
-                              },
-                          // TODO: implement logout
-                          child: Icon(
-                            Icons.exit_to_app_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          )),
-                      FilledButton.tonal(
-                          onPressed: () =>
-                              {Navigator.pushNamed(context, '/profile')},
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          ))
-                    ]),
-                SizedBox(height: 16)
-              ]))
-            ])));
+                flex: 1,
+                child: FilledButton(
+                    onPressed: () {
+                      // TODO: destroy room
+                      roomState.value = RoomState.none;
+                    },
+                    child: Text("Leave Room")),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                flex: 1,
+                child: FilledButton(
+                    onPressed: () {
+                      // TODO: make all players start the match?
+                      _lobbyReady();
+                    },
+                    child: Text("Ready!")),
+              ),
+            ]),
+          ),
+          SizedBox(height: 16),
+          Text("Waiting for match to start...", style: labelStyle),
+        ]);
   }
+
+  Widget waitUI(BuildContext) {
+    return CircularProgressIndicator();
+  }
+
   Container needLocationsUI() {
     return Container(
         decoration: BoxDecoration(

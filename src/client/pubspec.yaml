@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_compass: ^0.8.0
+  flutter_earth_globe: ^1.0.5
   flutter_launcher_icons:
   geolocator: ^13.0.1
   holding_gesture: ^1.2.0
@@ -38,3 +39,6 @@ flutter:
   assets:
     - assets/logo.png
     - assets/default_profile_picture.png
+    - assets/2k_earth-night.jpg
+    - assets/2k_earth-day.jpg
+    - assets/2k_stars.jpg

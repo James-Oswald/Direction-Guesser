@@ -28,7 +28,7 @@ class _ScorePageState extends State<ScorePage> {
     setState(() {
       score = prefs.getString('score');
       deg_off = prefs.getString('deg_off');
-      scores['score${roundNumber}'] = {
+      currentGame.scores['score${currentGame.roundNumber}'] = {
         'city': widget.city,
         'score': score ?? '0'
       };
@@ -118,15 +118,14 @@ class _ScorePageState extends State<ScorePage> {
                   SizedBox(height: 16),
                   FilledButton(
                       onPressed: () {
-                        if (roundNumber >= 2) {
-                          roundNumber = 0;
-                          if (roomState.value == RoomState.owner || roomState.value == RoomState.joiner) {
+                        if (currentGame.roundNumber >= currentGame.totalRounds) {
+                          if (currentGame.isMultiplayer) {
                             Navigator.pushNamed(context, '/multiplayer-results');
                           } else {
                             Navigator.pushNamed(context, '/results');
                           }
                         } else {
-                          roundNumber++;
+                          currentGame.incrementRound();
                           Navigator.pushNamed(context, '/guess');
                         }
                       },

@@ -9,6 +9,7 @@ class ResultsMultiplayerPage extends StatefulWidget {
 }
 
 class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
+  Map<String, Map<String, String>> scores = currentGame.scores;
   @override
   void initState() {
     super.initState();
@@ -78,6 +79,7 @@ class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
                   createLeaderBoard(),
                   FilledButton(
                       onPressed: () {
+                        roomState.value = RoomState.none;
                         Navigator.pushNamed(context, '/home');
                       },
                       child: Icon(

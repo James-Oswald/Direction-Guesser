@@ -42,11 +42,9 @@ class UsersServices {
   Future<bool> logoutUser() async {
     final prefs = await SharedPreferences.getInstance();
     final sessionId = prefs.getString('x-auth-token');
-
-    await prefs.remove('x-auth-token');
     if (sessionId == null) {
-      //No session ID found, user is already logged out
-      return false;
+      //No session ID found, user needs to login
+      return true;
     }
 
     final url = Uri.parse('$serverUrl/api/auth/');
@@ -58,15 +56,12 @@ class UsersServices {
         'Content-Type': 'application/json',
         'x-auth-token': '$sessionId',
       },
+      body: jsonEncode({'sign_out': {}}),
     );
 
-    if (response.statusCode == 200) {
-      // Remove session ID from shared preferences
-      await prefs.remove('x-auth-token');
-      return true;
-    } else {
-      return false;
-    }
+    await prefs.remove('x-auth-token');
+    await prefs.remove('username');
+    return true;
   }
 
   Future<bool> getUserData(String username) async {

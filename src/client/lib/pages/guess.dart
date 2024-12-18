@@ -436,20 +436,24 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     });
 
     //Get the list of cities
-    if (roundNumber == 0) {
-      var location = await Geolocator.getCurrentPosition();
-      //String city = await context.read<GameServices>().randomCity(location.latitude, location.longitude);
-      cities = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 3);
-      newGame = false;
-      if (cities.isEmpty) {
-        permissionState.value = PermissionsState.gpsServicesUnavailable;
-        return;
+    if (isMultiplayer){
+      targetCity = currentGame.citiesList[currentGame.roundNumber]['name'];
+      targetLatitude = currentGame.citiesList[currentGame.roundNumber]['latitude'];
+      targetLongitude = currentGame.citiesList[currentGame.roundNumber]['longitude'];
+    } else {
+      if (currentGame.roundNumber == 0) {
+        var location = await Geolocator.getCurrentPosition();
+        currentGame.citiesList = await context.read<GameServices>().getRandomCities(location.latitude.toStringAsFixed(2), location.longitude.toStringAsFixed(2), 3);
+        if (currentGame.citiesList.isEmpty) {
+          permissionState.value = PermissionsState.gpsServicesUnavailable;
+          return;
+        }
       }
+      targetCity = currentGame.citiesList[0]['name'];
+      targetLatitude = currentGame.citiesList[0]['latitude'];
+      targetLongitude = currentGame.citiesList[0]['longitude'];
     }
-    targetCity = cities[0]['name'];
-    targetLatitude = cities[0]['latitude'];
-    targetLongitude = cities[0]['longitude'];
-    cities.removeAt(0);
+    currentGame.citiesList.removeAt(0);
     setState(() {});
   }
 
