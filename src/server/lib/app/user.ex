@@ -5,39 +5,42 @@ defmodule App.User do
 
   # @private [:password, :__struct__, :__meta__]
  # ---
-  defp get(user) do
-    user
+  defp get(user, from) do
+    GenServer.reply(from, user)
   end
  # ---
-  defp lobby_create(user) do
+  defp lobby_create(user, from) do
     Logger.info("(#{user.id}): creating lobby")
     with lobby
             <- %App.Lobby.Schema{} |> DB.insert!(),
          {:ok, {:global, lobby_id}}
             <- App.Supervisor.Lobbies.start_lobby(lobby) do
       Logger.info("(u#{user.id}): created lobby (#{lobby_id})")
-      lobby_id
+      GenServer.reply(from, lobby_id)
     end
   end
 
-  defp lobby_join(user, lobby_id) do
+  defp lobby_join(user, lobby_id, from) do
     Logger.info("(u#{user.id}): joining lobby (#{lobby_id})")
-    GenServer.call({:global, lobby_id}, {:join, "u#{user.id}"})
+    GenServer.reply(from, GenServer.call({:global, lobby_id}, {:join, "u#{user.id}"}))
   end
 
-  defp lobby_ready(user, user_data = %{user_lat: _, user_lon: _}) do
+  defp lobby_ready(user, user_data = %{user_lat: _, user_lon: _}, from) do
     lobby = lobby_get(user)
     Logger.info("(u#{user.id}): #{inspect({:readyup, "u#{user.id}", user_data})}")
-    GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data}, :infinity)
+    GenServer.reply(from, GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data}, :infinity))
   end
-63
-  defp lobby_submit(user, guess_data) do
+
+  defp lobby_submit(user, guess_data, from) do
     lobby = lobby_get(user)
-    GenServer.call({:global, "l#{lobby.id}"}, {:submit_guess, "u#{user.id}", guess_data}, :infinity)
+    GenServer.reply(from, GenServer.call({:global, "l#{lobby.id}"}, {:submit_guess, "u#{user.id}", guess_data}, :infinity))
   end
 
   defp lobby_get(user) do
     App.DB.all(App.Lobby.Schema) |> Enum.reverse() |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first
+  end
+  defp lobby_get(user, from) do
+    GenServer.reply(from, App.DB.all(App.Lobby.Schema) |> Enum.reverse() |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first)
   end
  # ---
   use GenServer
@@ -58,37 +61,43 @@ defmodule App.User do
   end
 
   @impl true
-  def handle_call({:get, _}, _from, state) do
-    {:reply, get(state), state}
+  def handle_call({:get, _}, from, state) do
+    spawn(User, :get, [state, from])
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:lobby_create, _}, _from, state) do
+  def handle_call({:lobby_create, _}, from, state) do
     Logger.info("(u#{state.id}): creating lobby")
-    {:reply, lobby_create(state), state}
+    spawn(User, :lobby_create, [state, from])
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:lobby_join, %{id: id}}, _from, state) do
+  def handle_call({:lobby_join, %{id: id}}, from, state) do
     Logger.info("(u#{state.id}): joining lobby #{id}")
-    {:reply, lobby_join(state, id), state}
+    spawn(User, :lobby_join, [state, id, from])
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:lobby_ready, user_data = %{user_lat: _, user_lon: _}}, _from, state) do
+  def handle_call({:lobby_ready, user_data = %{user_lat: _, user_lon: _}}, from, state) do
     Logger.info("(u#{state.id}): readying up")
-    {:reply, lobby_ready(state, user_data), state}
+    spawn(User, :lobby_ready, [state, user_data, from])
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:lobby_submit, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, _from, state) do
+  def handle_call({:lobby_submit, guess_data = %{user_bearing: _, user_lat: _, user_lon: _, target_lat: _, target_lon: _}}, from, state) do
     Logger.info("(u#{state.id}): submitting guess #{inspect(guess_data)}")
-    {:reply, lobby_submit(state, guess_data), state}
+    spawn(User, :lobby_submit, [state, guess_data, from])
+    {:noreply, state}
   end
 
   @impl true
-  def handle_call({:lobby_get, _}, _from, state) do
-    {:reply, lobby_get(state), state}
+  def handle_call({:lobby_get, _}, from, state) do
+    spawn(User, :lobby_get, [state, from])
+    {:noreply, state}
   end
  # ---
 end
