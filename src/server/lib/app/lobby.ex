@@ -78,8 +78,10 @@ defmodule App.Lobby do
     if Map.has_key?(lobby.users, user_pid) do
       {:error, "User already in this lobby"}
     else
+      user =
+        GenServer.call({:global, user_pid}, {:get, {}})
       updated_users =
-        Map.put(lobby.users, user_pid, %{location: nil, score: nil, ready: false})
+        Map.put(lobby.users, user_pid, %{username: user.username, location: nil, score: nil, ready: false})
 
       DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
       :ok
