@@ -5,6 +5,10 @@ defmodule App.User do
 
   # @private [:password, :__struct__, :__meta__]
  # ---
+  defp get(user) do
+    user
+  end
+ # ---
   defp lobby_create(user) do
     Logger.info("(#{user.id}): creating lobby")
     with lobby
@@ -51,6 +55,11 @@ defmodule App.User do
   def init(user) do
     Logger.info("(u#{user.id}): logged in")
     {:ok, user}
+  end
+
+  @impl true
+  def handle_call({:get, _}, _from, state) do
+    {:reply, get(state), state}
   end
 
   @impl true
