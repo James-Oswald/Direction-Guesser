@@ -17,7 +17,7 @@ defmodule App.Lobby do
   end
 
   # ---
-  def get_lobby_info(lobby, user_pid) do
+  def get_lobby_info(lobby, user_pid, from) do
     lobby =
       Lobby.Schema |> DB.get_by!(%{id: lobby.id})
 
@@ -29,9 +29,9 @@ defmodule App.Lobby do
         last_round_scores: lobby.round_data
       }
 
-      {:ok, info}
+      GenServer.reply(from, {:ok, info})
     else
-      {:error, "User not associated with this lobby"}
+      GenServer.reply(from, {:error, "User not associated with this lobby"})
     end
   end
 
@@ -67,16 +67,16 @@ defmodule App.Lobby do
         readyup(lobby, user_pid, user_data, from)
       end
     else
-      {:error, "User not in this lobby"}
+      GenServer.reply(from, {:error, "User not in this lobby"})
     end
   end
 
-  def join(lobby, user_pid) do
+  def join(lobby, user_pid, from) do
     lobby =
       Lobby.Schema |> DB.get_by!(%{id: lobby.id})
 
     if Map.has_key?(lobby.users, user_pid) do
-      {:error, "User already in this lobby"}
+      GenServer.reply(from, {:error, "User already in this lobby"})
     else
       user =
         GenServer.call({:global, user_pid}, {:get, {}})
@@ -84,7 +84,7 @@ defmodule App.Lobby do
         Map.put(lobby.users, user_pid, %{username: user.username, location: nil, score: nil, ready: false})
 
       DB.update!(Ecto.Changeset.change(lobby, %{users: updated_users}))
-      :ok
+      GenServer.reply(from, :ok)
     end
   end
 
@@ -113,7 +113,7 @@ defmodule App.Lobby do
         submit_guess(lobby, user_pid, guess_data,from)
       end
     else
-      {:error, "User not in this lobby"}
+      GenServer.reply(from, {:error, "User not in this lobby"})
     end
   end
 
@@ -132,13 +132,15 @@ defmodule App.Lobby do
   end
 
   @impl true
-  def handle_call({:get_lobby_info, user_pid}, _from, lobby) do
-    {:reply, get_lobby_info(lobby, user_pid), lobby}
+  def handle_call({:get_lobby_info, user_pid}, from, lobby) do
+    spawn(Lobby, :get_lobby_info, [lobby, user_pid, from])
+    {:noreply, lobby}
   end
 
   @impl true
-  def handle_call({:join, user_pid}, _from, lobby) do
-    {:reply, join(lobby, user_pid), lobby}
+  def handle_call({:join, user_pid}, from, lobby) do
+    spawn(Lobby, :join, [lobby, user_pid, from])
+    {:noreply, lobby}
   end
 
   @impl true
