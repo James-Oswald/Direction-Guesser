@@ -1,5 +1,6 @@
 defmodule App.User do
   alias App.DB
+  alias App.User
 
   require Logger
 
