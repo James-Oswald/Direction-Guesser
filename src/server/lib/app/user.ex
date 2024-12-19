@@ -6,11 +6,11 @@ defmodule App.User do
 
   # @private [:password, :__struct__, :__meta__]
  # ---
-  defp get(user, from) do
+  def get(user, from) do
     GenServer.reply(from, user)
   end
  # ---
-  defp lobby_create(user, from) do
+  def lobby_create(user, from) do
     Logger.info("(#{user.id}): creating lobby")
     with lobby
             <- %App.Lobby.Schema{} |> DB.insert!(),
@@ -21,26 +21,26 @@ defmodule App.User do
     end
   end
 
-  defp lobby_join(user, lobby_id, from) do
+  def lobby_join(user, lobby_id, from) do
     Logger.info("(u#{user.id}): joining lobby (#{lobby_id})")
     GenServer.reply(from, GenServer.call({:global, lobby_id}, {:join, "u#{user.id}"}))
   end
 
-  defp lobby_ready(user, user_data = %{user_lat: _, user_lon: _}, from) do
+  def lobby_ready(user, user_data = %{user_lat: _, user_lon: _}, from) do
     lobby = lobby_get(user)
     Logger.info("(u#{user.id}): #{inspect({:readyup, "u#{user.id}", user_data})}")
     GenServer.reply(from, GenServer.call({:global, "l#{lobby.id}"}, {:readyup, "u#{user.id}", user_data}, :infinity))
   end
 
-  defp lobby_submit(user, guess_data, from) do
+  def lobby_submit(user, guess_data, from) do
     lobby = lobby_get(user)
     GenServer.reply(from, GenServer.call({:global, "l#{lobby.id}"}, {:submit_guess, "u#{user.id}", guess_data}, :infinity))
   end
 
-  defp lobby_get(user) do
+  def lobby_get(user) do
     App.DB.all(App.Lobby.Schema) |> Enum.reverse() |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first
   end
-  defp lobby_get(user, from) do
+  def lobby_get(user, from) do
     GenServer.reply(from, App.DB.all(App.Lobby.Schema) |> Enum.reverse() |> Enum.filter(fn lobby -> lobby.users |> Map.has_key?("u#{user.id}") end) |> List.first)
   end
  # ---
