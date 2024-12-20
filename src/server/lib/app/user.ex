@@ -14,10 +14,12 @@ defmodule App.User do
     Logger.info("(#{user.id}): creating lobby")
     with lobby
             <- %App.Lobby.Schema{} |> DB.insert!(),
-         {:ok, {:global, lobby_id}}
+         {:ok, lobby_id}
             <- App.Supervisor.Lobbies.start_lobby(lobby) do
       Logger.info("(u#{user.id}): created lobby (#{lobby_id})")
       GenServer.reply(from, lobby_id)
+    else
+	e -> GenServer.reply(from, {:error, "failed to create lobby #{inspect(e)}"})
     end
   end
 
