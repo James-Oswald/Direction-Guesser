@@ -56,8 +56,12 @@ class Game{
 
   //TODO: when backend is sending back generalized locations of users send 
   //back a map of usernames and coordinates
-  List<String> getPlayers(){
-    return playerInfo.keys.toList();
+  List<dynamic> getPlayers(){
+    return playerInfo.entries.map((e) => e.value['username']).toList();
+  }
+
+  int getNumPlayers(){
+    return playerInfo.length;
   }
 
   //TODO: when backend is update with round logic and multiplayer customization 
