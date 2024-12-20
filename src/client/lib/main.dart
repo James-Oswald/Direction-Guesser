@@ -15,6 +15,9 @@ import 'routes.dart';
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 List<CameraDescription> cameras = [];
 bool soundEnabled = true;
+bool globeEnabled = true;
+const String globeLight = 'assets/2k_earth-day.jpg';
+const String globeDark = 'assets/2k_earth-night.jpg';
 
 enum RoomState { none, wait, owner, joiner }
 final ValueNotifier<RoomState> roomState = ValueNotifier(RoomState.none);
@@ -75,6 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(Duration(seconds: 2)); // Optional delay for better UX
     final prefs = await SharedPreferences.getInstance();
     String? sessionId = prefs.getString('x-auth-token');
+    globeEnabled = prefs.getBool('globeEnabled') ?? true;
 
     if (sessionId != null) {
       currentUser = User(username: prefs.getString('username'), sessionId: prefs.getString('sessionId'));

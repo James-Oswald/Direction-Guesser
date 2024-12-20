@@ -25,12 +25,6 @@ class _ScorePageState extends State<ScorePage> {
     setState(() {});
   }
 
-  void _getLobbyInfo() async {
-    Map<String, dynamic> lobbyInfo = await context.read<GameServices>().getLobbyInfo();
-    currentGame.setLobbyUserInfo(lobbyInfo);
-    setState(() {});
-  }
-
   void _getScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -126,9 +120,6 @@ class _ScorePageState extends State<ScorePage> {
                   SizedBox(height: 16),
                   FilledButton(
                       onPressed: () {
-                        if(currentGame.isMultiplayer) {
-                          _getLobbyInfo();
-                        }
                         currentGame.incrementRound();
                         if (currentGame.roundNumber >= currentGame.totalRounds) {
                           if (currentGame.isMultiplayer) {

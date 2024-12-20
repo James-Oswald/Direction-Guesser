@@ -1,17 +1,18 @@
 import 'dart:async';
-
-import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:direction_guesser/widgets/points_pill.dart';
 import 'package:direction_guesser/widgets/permissions_denied_card.dart';
 import 'package:direction_guesser/widgets/missing_device_card.dart';
 import 'package:direction_guesser/controllers/user_services.dart';
 import 'package:direction_guesser/controllers/game_services.dart';
+import 'package:flutter_earth_globe/globe_coordinates.dart';
+import 'package:flutter_earth_globe/point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
+import 'dart:math';
 
 import '../main.dart';
 import '../widgets/text_entry_pill.dart';
@@ -32,27 +33,34 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<PermissionsState> permissionState =
       ValueNotifier(PermissionsState.okay);
   late AppLifecycleListener lifecycleListener;
+    String globeMode = globeDark;
   late FlutterEarthGlobeController globeController =
       FlutterEarthGlobeController(
           isRotating: true,
           rotationSpeed: 0.05,
-          surface: Image.asset('assets/2k_earth-night.jpg').image);
+          surface: Image.asset(globeMode).image);
 
   String roomCode = "";
   int playersInRoom = 0;
+  final random = Random();
+
 
   @override
   initState() {
     super.initState();
+    //
+    globeMode = themeNotifier.value == ThemeMode.dark ? globeDark : globeLight;
     globeController = FlutterEarthGlobeController(
         isRotating: true,
         rotationSpeed: 0.05,
-        surface: Image.asset('assets/2k_earth-night.jpg').image,
+        surface: Image.asset(globeMode).image,
         background: Image.asset('assets/2k_stars.jpg').image
         );
     lifecycleListener = AppLifecycleListener(onRestart: checkSensors);
     checkSensors();
   }
+
+  @override
 
   void _logout() async {
     bool success = await context.read<UsersServices>().logoutUser();
@@ -67,7 +75,10 @@ class _HomePageState extends State<HomePage> {
   void _getLobbyInfo() async {
     final prefs = await SharedPreferences.getInstance();
     String lobbyName = prefs.getString('currentLobby') ?? "";
-    await context.read<GameServices>().getLobbyInfo();
+    Map<String, dynamic> currentLobbyInfo = await context.read<GameServices>().getLobbyInfo();
+    currentGame.setLobbyUserInfo(currentLobbyInfo);
+    playersInRoom = currentGame.getPlayers().length;
+    //addUsersToGlobe();
     setState(() {});
   }
 
@@ -136,6 +147,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //TODO: Refact/ Move all sensors to separate page and check on app start and on game begin
   void checkSensors() async {
     await Geolocator.checkPermission().then((permission) {
       if (permission == LocationPermission.deniedForever ||
@@ -153,6 +165,53 @@ class _HomePageState extends State<HomePage> {
       permissionState.value = PermissionsState.okay;
       setState(() {});
     });
+  }
+
+  //Add users to globe
+  //TODO: When Backend is capable of sending general location data of user change 
+  // now adds randomly
+  void addUsersToGlobe() {
+    List<Point> currentPoints = globeController.points;
+    List<dynamic> users = currentGame.getPlayers();
+    //games starts and users are added
+    if (users.length == 0) {
+      for (String user in users) {
+        globeController.addPoint(
+            Point(
+                id: user,
+                label: user,
+                isLabelVisible: true,
+                coordinates: GlobeCoordinates(-90 + (random.nextDouble() * 180), -180 + (random.nextDouble() * 360)),
+                labelTextStyle: TextStyle(color: Colors.white)),
+                );
+      }
+    } else {
+      //remove users that are no longer in the room
+      for (Point point in currentPoints) {
+        if (!users.contains(point.label)) {
+          globeController.removePoint(point.id);
+        }
+      }
+      //add users that are not in the room
+      for (String user in users) {
+        bool found = false;
+        for (Point point in currentPoints) {
+          if (point.label == user) {
+            found = true;
+          }
+        }
+        if (!found) {
+          globeController.addPoint(
+            Point(
+                id: user,
+                label: user,
+                isLabelVisible: true,
+                coordinates: GlobeCoordinates(-90 + (random.nextDouble() * 180), -180 + (random.nextDouble() * 360)),
+                labelTextStyle: TextStyle(color: Colors.white)),
+                );
+        }
+      }
+    }
   }
 
   @override
@@ -200,13 +259,13 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           children: [
             SafeArea(
-                child: FlutterEarthGlobe(
+                child: globeEnabled ? FlutterEarthGlobe(
               controller: globeController,
               radius: 60,
               //TODO: temporary fix globe is not centered
               //will need to inspect widget tree to see why
               alignment: Alignment(0, -0.4),
-            )),
+            ) : Container()),
             Padding(
                 padding: EdgeInsets.all(8),
                 child: Column(
@@ -215,6 +274,8 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(height: 64),
                       PointsPill(points: 15827),
                       SizedBox(height: 32),
+                      if (!globeEnabled)
+                        Image.asset('assets/logo.png', height: 200),
                       Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -245,7 +306,9 @@ class _HomePageState extends State<HomePage> {
                                   FilledButton.tonal(
                                       onPressed: () => {
                                             Navigator.pushNamed(
-                                                context, '/settings')
+                                                context, '/settings').then((_) => {
+                                                  setState(() {})
+                                                })
                                           },
                                       child: Icon(
                                         Icons.settings_rounded,

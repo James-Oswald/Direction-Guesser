@@ -54,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 128),
+                    SizedBox(height: 98),
                     SizedBox(
                         height: 280,
                         width: 280,
@@ -88,6 +88,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     Spacer(),
                     Row(children: [
                       Switch(
+                          value: globeEnabled,
+                          onChanged: (bool value) {
+                            setState(() {
+                              globeEnabled = value;
+                            });
+                          }),
+                      SizedBox(width: 8),
+                      Text("Enable 3d Globe", style: mediumStyle)
+                    ]),
+                    Spacer(),
+                    Row(children: [
+                      Switch(
                           value: soundEnabled,
                           onChanged: (bool value) {
                             setState(() {
@@ -103,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Spacer(),
                     FilledButton.tonal(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/home');
+                          Navigator.pop(context);
                         },
                         child: Icon(
                           Icons.arrow_back_rounded,

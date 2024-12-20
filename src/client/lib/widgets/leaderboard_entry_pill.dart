@@ -107,7 +107,7 @@ class LeaderboardEntryPill extends StatelessWidget {
                   ]),
                   Column(children: [
                     Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 24),
                         child: Text(
                           formatter.format(score),
                           style: TextStyle(
