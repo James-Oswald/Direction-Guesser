@@ -343,6 +343,10 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
 
     // Check the result of sending the guess
     if (guessSentSuccessfully) {
+      if (currentGame.isMultiplayer) {
+        Map<String, dynamic> lobbyInfo = await context.read<GameServices>().getLobbyInfo();
+        currentGame.setLobbyUserInfo(lobbyInfo);
+      }
       // Show success message
       Navigator.pushNamed(context, '/score', arguments: city);
       if (context.mounted) {
@@ -457,6 +461,8 @@ class _GuessPageState extends State<GuessPage> with TickerProviderStateMixin {
     currentGame.citiesList.removeAt(0);
     setState(() {});
   }
+
+  
 
   @override
   void dispose() {

@@ -2,8 +2,8 @@ import 'package:direction_guesser/widgets/leaderboard_entry_pill.dart';
 import 'package:flutter/material.dart';
 
 class LeaderboardCard extends StatelessWidget {
-  const LeaderboardCard() : super();
-
+  final List<MapEntry<String, List<dynamic>>> scores;
+  const LeaderboardCard(this.scores) : super();
   @override
   Widget build(BuildContext context) {
     const double interiorPadding = 24;
@@ -17,41 +17,35 @@ class LeaderboardCard extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   // TODO: this should all be queried from the backend
-                  children: const [
+                  children: [
                     LeaderboardEntryPill(
-                        profilePicture: NetworkImage(
-                            "https://cdn.discordapp.com/avatars/218424322560229376/58a40f5e74e76937ffc92d9c36717227.webp?size=128"),
-                        username: "ishtyaq",
-                        score: 90208,
-                        rank: Rank.first),
-                    SizedBox(height: interiorPadding),
-                    LeaderboardEntryPill(
-                        profilePicture: NetworkImage(
-                            "https://cdn.discordapp.com/avatars/200476693691891712/0c8670c60270820ce1ed7756ddbf46c7.webp?size=128"),
-                        username: "link_",
-                        score: 89962,
-                        rank: Rank.second),
-                    SizedBox(height: interiorPadding),
-                    LeaderboardEntryPill(
-                        profilePicture: NetworkImage(
-                            "https://cdn.discordapp.com/avatars/351160618625007617/615e31688ed3c111e24027e41bc8dae1.webp?size=128"),
-                        username: "shariemakesart",
-                        score: 67863,
-                        rank: Rank.third),
-                    SizedBox(height: interiorPadding),
-                    LeaderboardEntryPill(
-                        profilePicture: NetworkImage(
-                            "https://cdn.discordapp.com/avatars/915982311135248406/1e910bdeb207a71edf4068885dfb8780.webp?size=128"),
-                        username: "vomit_chan",
-                        score: 14137,
-                        rank: Rank.other),
-                    SizedBox(height: interiorPadding),
-                    LeaderboardEntryPill(
-                        profilePicture: NetworkImage(
-                            "https://cdn.discordapp.com/avatars/274354935036903424/14d6f3b6346da46b18ca5b0b1c46141c.webp?size=128"),
-                        username: "ReturnToLean4",
-                        score: 2753,
-                        rank: Rank.other)
+                        username: scores[0].key ?? "---",
+                        score: scores[0].value[0] ?? "---",
+                        rank: Rank.first,
+                        deg_off: scores[0].value[1].toStringAsFixed(2) ?? "---" + "° off",),
+                        
+                    const SizedBox(height: interiorPadding),
+                    if(scores.length > 1)
+                      LeaderboardEntryPill(
+                          username: scores[1].key ?? "---",
+                          score: scores[1].value[0] ?? "---",
+                          rank: Rank.second,
+                          deg_off: scores[1].value[1].toStringAsFixed(2) ?? "---" + "° off",),
+                    const SizedBox(height: interiorPadding),
+                    if (scores.length > 2)
+                      LeaderboardEntryPill(
+                          username: scores[2].key ?? "---",
+                          score: scores[2].value[0] ?? "---",
+                          rank: Rank.third,
+                          deg_off: scores[2].value[1].toStringAsFixed(2) ?? "---" + "° off",),
+                    const SizedBox(height: interiorPadding),
+                    if (scores.length > 3)
+                      for (int i = 3; i < scores.length; i++)
+                        LeaderboardEntryPill(
+                            username: scores[i].key ?? "---",
+                            score: scores[i].value[0] ?? "---",
+                            rank: Rank.other,
+                            deg_off: scores[i].value[1].toStringAsFixed(2) ?? "---" + "° off",)
                   ],
                 ))));
   }

@@ -2,14 +2,15 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:math' as Math;
 
+import 'package:direction_guesser/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GameServices {
 
-  //String serverUrl = 'http://localhost:8080';
-  //String serverUrl = 'http://10.0.2.2:8080';
-  String serverUrl = 'http://dirg.ieeeualbany.org';
+  //String serverUrl = 'http://localhost:8080'; //localhost
+  //String serverUrl = 'http://10.0.2.2:8080'; //Android emulator
+  String serverUrl = 'http://dirg.ieeeualbany.org'; //Server
 
   Future<String> randomCity(double latitude, double longitude) async {
     final url = Uri.parse('$serverUrl/api/process');
@@ -204,7 +205,7 @@ class GameServices {
     }
   }
 
-  Future<bool> getLobbyInfo() async {
+  Future<Map<String, dynamic>> getLobbyInfo() async {
     final url = Uri.parse('$serverUrl/api/user/');
     final prefs = await SharedPreferences.getInstance();
 
@@ -220,13 +221,10 @@ class GameServices {
       body: body,
     );
 
-
-
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      // TODO: Store the resulting lobby info
+      return jsonDecode(response.body);
     }
-    return false;
+    return {};
   }
 
   Future<List<Map<String, dynamic>>> lobbyReady(String user_lat, String user_lon) async {

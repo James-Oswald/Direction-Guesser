@@ -1,6 +1,8 @@
 import 'package:direction_guesser/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../controllers/game_services.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({required this.city}) : super();
@@ -20,6 +22,12 @@ class _ScorePageState extends State<ScorePage> {
   void initState() {
     super.initState();
     _getScore();
+    setState(() {});
+  }
+
+  void _getLobbyInfo() async {
+    Map<String, dynamic> lobbyInfo = await context.read<GameServices>().getLobbyInfo();
+    currentGame.setLobbyUserInfo(lobbyInfo);
     setState(() {});
   }
 
@@ -118,6 +126,9 @@ class _ScorePageState extends State<ScorePage> {
                   SizedBox(height: 16),
                   FilledButton(
                       onPressed: () {
+                        if(currentGame.isMultiplayer) {
+                          _getLobbyInfo();
+                        }
                         currentGame.incrementRound();
                         if (currentGame.roundNumber >= currentGame.totalRounds) {
                           if (currentGame.isMultiplayer) {

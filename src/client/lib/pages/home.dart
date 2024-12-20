@@ -17,6 +17,8 @@ import '../main.dart';
 import '../widgets/text_entry_pill.dart';
 
 enum PermissionsState { okay, gpsServicesUnavailable, locationDenied }
+const String globeLight = 'assets/2k_earth-day.jpg';
+const String globeDark = 'assets/2k_earth-night.jpg';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,7 +47,9 @@ class _HomePageState extends State<HomePage> {
     globeController = FlutterEarthGlobeController(
         isRotating: true,
         rotationSpeed: 0.05,
-        surface: Image.asset('assets/2k_earth-night.jpg').image);
+        surface: Image.asset('assets/2k_earth-night.jpg').image,
+        background: Image.asset('assets/2k_stars.jpg').image
+        );
     lifecycleListener = AppLifecycleListener(onRestart: checkSensors);
     checkSensors();
   }
@@ -105,13 +109,13 @@ class _HomePageState extends State<HomePage> {
 
   void _createLobby() async {
     bool success = await context.read<GameServices>().createLobby();
-    _getLobbyInfo();
     if (success) {
       final prefs = await SharedPreferences.getInstance();
       currentGame.lobbyId = prefs.getString('currentLobby') ?? "";
       roomCode = currentGame.lobbyId;
       currentGame.isMultiplayer = true;
       roomState.value = RoomState.owner;
+      _getLobbyInfo();
       setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

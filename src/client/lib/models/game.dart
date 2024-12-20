@@ -1,30 +1,29 @@
 // Purpose: Model for game
 // Can use bused in the future for further customization of the game
+import 'dart:convert';
+
 class Game{
   String lobbyId;
   int totalRounds;
   int roundNumber = 0;
   int timeLimit;
-  Map<String, Map<String, String>> scores = {};
-  Map<String, List<String>> playerScores = {};
-  Map<String, String> playerStatus = {};
+  //single player scores
+  Map<String, Map<String, String>> scores = {}; 
+  //add range when backend is ready
+  //int range;
+
+  // currently contains maps of key - username, value - map of
+  //('location' - ), 
+  //('ready' - 'true'/'false'),  
+  //('score'- 'score''deg_off'),
+  //('username' - '')
+  Map<String, dynamic> playerInfo = {};
+  List<MapEntry<String, List<dynamic>>> playerScoresSorted = [];
   List<Map<String, dynamic>> citiesList = [];
   bool isMultiplayer = false;
 
   Game({required this.lobbyId, required this.totalRounds, required this.timeLimit});
 
-  void setPlayerStatus(String player, String status) {
-    playerStatus[player] = status;
-  }
-  String getPlayerStatus(String player) {
-    return playerStatus[player]!;
-  }
-  void setPlayerScore(String player, int roundNumber, String score) {
-    playerScores[player]![roundNumber] = score;
-  }
-  List<String>? getPlayerScore(String player) {
-    return playerScores[player];
-  }
   void incrementRound() {
     roundNumber++;
   }
@@ -34,17 +33,66 @@ class Game{
   void popCity() {
     citiesList.removeAt(0);
   }
-  void addScore(String city, Map<String, String> score) {
-    //playerScores[city] = score;
+  void addLobbyInfo(String json){
+    playerInfo = jsonDecode(json);
   }
-  Map<String, String>? getScore(String city) {
-    //return scores[city]!;
-    return null;
+  
+  //TODO: add exception handling
+  dynamic getUserInfo(String username){
+    return playerInfo[username];
   }
+
+  bool getUserReadyStatus(String username){
+    return playerInfo[username]['ready'];
+  }
+
+  //returns a list of 2 strings, score and deg_off 
+  List<String> getUserScore(String username){
+    return [
+      playerInfo[username]['score'][0],
+      playerInfo[username]['score'][1]
+    ]; //playerInfo[username]['score'][];
+  }
+
+  //TODO: when backend is sending back generalized locations of users send 
+  //back a map of usernames and coordinates
+  List<String> getPlayers(){
+    return playerInfo.keys.toList();
+  }
+
+  //TODO: when backend is update with round logic and multiplayer customization 
+  //other variables can be set using the sent json map such as
+  // ragne, timeLimit, etc.
+  void setLobbyUserInfo(Map<String, dynamic> info){
+    playerInfo = info['users'];
+  }
+
+  List<MapEntry<String, List<dynamic>>> getFinalScores(){
+    final List<MapEntry<String, List<dynamic>>> sortedList = [];
+    for (var entry in playerInfo.entries) {
+      final username = entry.value["username"];
+      final List<dynamic> playerScores = entry.value["score"];
+      int score = playerScores[0][1];
+      double degOff = playerScores[1][1];
+
+      if (score != null && degOff != null) {
+        sortedList.add(MapEntry(username, [score, degOff]));
+      }else{
+        sortedList.add(MapEntry(username, [0, 360.0]));
+      }
+      
+    }
+    sortedList.sort((a, b) => b.value[0].compareTo(a.value[0]));
+    playerScoresSorted = sortedList;
+    return sortedList;
+  }
+
   void clear() {
-    playerScores.clear();
-    playerStatus.clear();
+    lobbyId = '';
+    totalRounds = 1;
+    scores.clear();
     citiesList.clear();
+    playerInfo.clear();
     roundNumber = 0;
     isMultiplayer = false;
   }
