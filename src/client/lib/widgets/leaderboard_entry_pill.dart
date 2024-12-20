@@ -12,15 +12,15 @@ final NumberFormat formatter = NumberFormat.decimalPatternDigits(
 class LeaderboardEntryPill extends StatelessWidget {
   const LeaderboardEntryPill(
       {required this.username,
-      required this.profilePicture,
       required this.score,
-      required this.rank})
+      required this.rank,
+      required this.deg_off})
       : super();
 
   final String username;
-  final NetworkImage profilePicture;
   final int score;
   final Rank rank;
+  final String deg_off;
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +55,15 @@ class LeaderboardEntryPill extends StatelessWidget {
                     children: [
                       Row(children: [
                         CircleAvatar(
-                            foregroundImage: profilePicture,
                             backgroundColor: Theme.of(context)
                                 .colorScheme
-                                .onSecondaryContainer),
+                                .onSecondaryContainer,
+                            //TODO: change text color based on rank
+                            child: Text(username[0].toUpperCase(),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary))),
                         SizedBox(width: 16),
                         Text(
                           username,
@@ -80,16 +85,19 @@ class LeaderboardEntryPill extends StatelessWidget {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(100.0)),
           child: Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(6),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(children: [
                     CircleAvatar(
-                        foregroundImage: profilePicture,
                         backgroundColor:
-                            Theme.of(context).colorScheme.onSecondaryContainer),
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        // TODO: change text color based on rank
+                        child: Text(username[0].toUpperCase(),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary))),
                     SizedBox(width: 16),
                     Text(
                       username,
@@ -97,13 +105,23 @@ class LeaderboardEntryPill extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onPrimary),
                     ),
                   ]),
-                  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        formatter.format(score),
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary),
-                      ))
+                  Column(children: [
+                    Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          formatter.format(score),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary),
+                        )),
+                    Text(
+                      deg_off+" off" ?? "XX.XX° off",
+                      style: TextStyle(
+                          fontSize: 8,
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
+                  ])
                 ],
               )))
     ]);

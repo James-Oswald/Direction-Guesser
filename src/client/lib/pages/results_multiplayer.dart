@@ -1,5 +1,9 @@
 import 'package:direction_guesser/main.dart';
+import 'package:direction_guesser/widgets/leaderboard_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../controllers/game_services.dart';
 import '../main.dart';
 
 class ResultsMultiplayerPage extends StatefulWidget {
@@ -10,11 +14,17 @@ class ResultsMultiplayerPage extends StatefulWidget {
 }
 
 class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
-  Map<String, Map<String, String>> scores = currentGame.scores;
+  Map<String, dynamic> scores = currentGame.scores;
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
     currentGame.clear();
+    super.dispose();
   }
 
   @override
@@ -63,24 +73,10 @@ class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
                     style: displaySmallStyle,
                     textAlign: TextAlign.center,
                   ),
-                  Text(
-                    scores.containsKey("score1") && scores["score1"] != null
-                      ? "${scores["score1"]?["city"]}: ${scores["score1"]?["score"]} points"
-                      : "No data available",
-                    style: displaySmallStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    scores.containsKey("score2") && scores["score2"] != null
-                      ? "${scores["score2"]?["city"]}: ${scores["score2"]?["score"]} points"
-                      : "No data available",
-                    style: displaySmallStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                  Spacer(),
-                  createLeaderBoard(),
+                  LeaderboardCard(currentGame.getFinalScores()),
                   FilledButton(
                       onPressed: () {
+                        currentGame.clear();
                         roomState.value = RoomState.none;
                         Navigator.pushNamed(context, '/home');
                       },
@@ -91,22 +87,5 @@ class _ResultsMultiplayerPageState extends State<ResultsMultiplayerPage> {
                       )),
                   Spacer()
                 ])))));
-  }
-
-  Column createLeaderBoard() {
-    TextStyle displaySmallStyle = TextStyle(
-        fontStyle: Theme.of(context).textTheme.displaySmall?.fontStyle,
-        fontSize: Theme.of(context).textTheme.displaySmall?.fontSize,
-        color: Theme.of(context).colorScheme.primary);
-
-    // TODO: get the usernames and scores from backend
-    List<String> usernames = ["user1", "user2", "user3"];
-    List<int> scores = [90, 65, 43];
-    List<Widget> lines = [];
-    for (int i = 0; i < usernames.length; i++) {
-      lines.add(Text("${usernames[i]}: ${scores[i]}", style: displaySmallStyle));
-      lines.add(SizedBox(height: 16));
-    }
-    return Column(children: lines);
   }
 }
